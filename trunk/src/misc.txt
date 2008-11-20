@@ -1,0 +1,670 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class ChessFrame extends JFrame 
+{
+
+	private static final long serialVersionUID = 1L;
+	private static final int WIDTH=725;
+	private static final int HEIGHT=720;
+	private static final String newline = "\n";
+	
+	//Menu 
+	private JMenuBar menuBar;
+	private JMenu fileMenu;
+	private JMenuItem newMenuItem,exitMenuItem;
+	private JCheckBoxMenuItem verboseMenuItem;
+	
+	//Hold Player Info/Check Info
+	private JPanel topPanel;
+	
+	//Hold Tiles
+	private JPanel tilePanel;
+	
+	//Hold log info.
+	private JPanel verbosePanel;
+	
+	//Verbose TestBox
+	private JTextArea verboseBox; 
+	
+	//Scroll Box
+	private JScrollPane verboseScroll;
+	  
+	//Tile Buttons
+	private JButton [][]tilebutton;
+	
+	//Icon
+	private Icon tileIcon[];
+	
+	//Radio/Group For Players
+	private JRadioButton rdPlayer1;
+	private JRadioButton rdPlayer2;
+	private ButtonGroup groupPlayer;
+	
+	//Use to Decide Tile Color
+	private int colorFlag;
+	
+	//Board Object
+	private Board b;
+	
+	private boolean srcClick;
+	
+	public ChessFrame()
+	{
+		//Set the FrameUp,
+		super();
+		setSize(WIDTH,HEIGHT);
+		
+		//Default Close Method
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		//Deny Resize Frame, Set BorderLayout
+		this.setResizable(false);
+		this.setLayout(new BorderLayout());
+		
+		//Create Menu Bar
+		menuBar = new JMenuBar();
+		
+		//Create First DropDown Menu
+		fileMenu = new JMenu("File");
+		
+			//Add the New Game Item and Listener
+			newMenuItem  = new JMenuItem("New");
+			newMenuItem.addActionListener(new NewGameButtonListener());
+			
+			//Add the Verbose Option and Listener
+			verboseMenuItem = new JCheckBoxMenuItem("Verbose", false);
+			verboseMenuItem.addActionListener(new VerboseButtonListener());
+			   
+			//Add the Exit Item And Listener
+			exitMenuItem = new JMenuItem("Exit");
+			exitMenuItem.addActionListener(new ExitGameButtonListener());
+
+			//Add all Menu Items to Menu
+			fileMenu.add(newMenuItem);
+			fileMenu.add(verboseMenuItem);
+			fileMenu.add(exitMenuItem);
+			 
+			//Add Menu To Menu Bar
+			menuBar.add(fileMenu);
+			
+			//Add to Frame
+			this.setJMenuBar(menuBar);
+
+		//Create TopPanel For Player/Check Info
+		topPanel = new JPanel();
+		topPanel.setLayout(new FlowLayout());
+		
+			//Create the Player Radio/Group
+			groupPlayer = new ButtonGroup();
+			rdPlayer1 = new JRadioButton("Player1");
+			rdPlayer2 = new JRadioButton("Player2");
+			
+			///Player 1 turn
+			rdPlayer1.setSelected(true);
+		
+			//Disable Selecting
+			rdPlayer1.setEnabled(false);
+			rdPlayer2.setEnabled(false);
+			
+			//Add Players to Group
+			groupPlayer.add(rdPlayer1);
+			groupPlayer.add(rdPlayer2);
+		
+			//Add Radio Buttons to North Panel
+			topPanel.add(rdPlayer1);
+			topPanel.add(rdPlayer2);
+		
+		//Create the Verbose Panel for Logs
+		verbosePanel = new JPanel();
+		verbosePanel.setLayout(new FlowLayout());
+		
+			//Create the verbose box
+			verboseBox = new JTextArea("[VERBOSE]"+newline,5,63);
+		
+			//Add Black border
+			verboseBox.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black));
+		
+			//Don't let user enter text
+			verboseBox.setEditable(false);
+			
+			//Create scroll area from the textarea
+			verboseScroll = new JScrollPane(verboseBox);
+		
+			//Never Show the Horizontal scrollbar
+			verboseScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+			//Add Scrollbox to verbose panel
+			verbosePanel.add(verboseScroll);
+		
+			//Hide scrollbox at startup
+			verbosePanel.setVisible(false);
+		
+	
+		//Panel For Chess Title w/Grid Layout
+		tilePanel =new JPanel();
+		tilePanel.setLayout(new GridLayout(8,8,3,3));
+			
+			//Add Black Border to Tiles
+			tilePanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black));
+		
+			//Create the Title Buttons	
+			tilebutton = new JButton[8][8];
+		
+			//Set Color Tile
+			colorFlag=1;
+		
+			//Init the Buttons
+			for (int i=0;i<8;i++)
+			{
+				for(int j=0;j<8;j++)
+				{
+					//Figure out the Color Begin of Row
+					if (j==0)
+					{
+						if (colorFlag ==0)
+						{
+							colorFlag = 1;
+						}
+						else
+						{
+							colorFlag = 0;
+						}
+					}
+				
+					//Create Button
+					tilebutton[i][j] = new JButton();
+					//tilebutton[i][j].setName("i"+"j");
+					tilebutton[i][j].setActionCommand(""+i+j);
+		
+					//Alternate Color in Rows
+					if (colorFlag == 0)
+					{
+						tilebutton[i][j].setBackground(Color.white);
+						colorFlag = 1;
+					}
+					else
+					{
+						tilebutton[i][j].setBackground(Color.gray);
+						colorFlag = 0;
+					}
+
+					//Setup Listener, and Add to Panel
+					tilebutton[i][j].addActionListener(new TileButtonListener());
+					tilePanel.add(tilebutton[i][j]);
+				}
+			}
+
+		
+		//Add the PlayerInfo To North Panel
+		this.add(topPanel,BorderLayout.NORTH);
+		
+		//Add ChessBoard to Center Panel
+		this.add(tilePanel,BorderLayout.CENTER);
+		
+		//Add Verbose Panel to South
+		this.add(verbosePanel,BorderLayout.SOUTH);
+		
+		//FillIconArray
+		tileIcon = new ImageIcon[12];
+
+		tileIcon[0] = new ImageIcon("src/pic/white/bishop.png");
+		tileIcon[1] = new ImageIcon("src/pic/white/king.png");
+		tileIcon[2] = new ImageIcon("src/pic/white/knight.png");
+		tileIcon[3] = new ImageIcon("src/pic/white/pawn.png");
+		tileIcon[4] = new ImageIcon("src/pic/white/queen.png");
+		tileIcon[5] = new ImageIcon("src/pic/white/rook.png");
+		tileIcon[6] = new ImageIcon("src/pic/black/bishop.png");
+		tileIcon[7] = new ImageIcon("src/pic/black/king.png");
+		tileIcon[8] = new ImageIcon("src/pic/black/knight.png");
+		tileIcon[9] = new ImageIcon("src/pic/black/pawn.png");
+		tileIcon[10] = new ImageIcon("src/pic/black/queen.png");
+		tileIcon[11] = new ImageIcon("src/pic/black/rook.png");
+				
+		//SetIcons
+		this.setInitIcon();
+		
+		srcClick = true;
+		
+		//Set the Game Up
+		b = new Board();
+		
+	}
+	
+	//When each button is pressed
+	private class TileButtonListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{			
+			int srcR,srcC,destR,destC=0;
+			
+			String s = e.getActionCommand();
+			
+			try
+			{
+		
+				//Source Not Set
+				if (srcClick)
+				{
+					srcR = Integer.parseInt(s.substring(0, 1));
+					srcC = Integer.parseInt(s.substring(1));
+					
+					if (b.validateFirstClick(srcR,srcC))
+					{
+						this.setHighlight(srcR,srcC);
+					}
+					
+				}
+				else
+				{
+					destR = Integer.parseInt(s.substring(0, 1));
+					destC = Integer.parseInt(s.substring(1));
+					
+					if (b.validateSecondClick(destR, destC))
+					{
+						this.updateIcon(destR,destC);
+						this.clearHighlight(srcR,srcC);
+						this.toggleTurn();
+					}
+				}	
+			}
+			catch(Exception x)
+			{
+				addMessage(x.getMessage());
+				this.clearHighlight(srcR,srcC);
+				this.clearSourceClick();
+			}
+		}
+		
+		private void setHighlight(int srcR, int srcC)
+		{
+				tilebutton[srcR][srcC].setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.blue));
+		}
+		
+		private void clearHighlight(int srcR, int srcC)
+		{
+				tilebutton[srcR][srcC].setBorder(null);	
+		}
+		
+		private void toggleTurn()
+		{
+			if(rdPlayer1.isSelected())
+				rdPlayer2.setSelected(true);
+			else
+				rdPlayer1.setSelected(true);
+
+			b.toggleTurn();
+		}
+		
+		private void updateIcons(int destR, int destC)
+		{	
+
+				//Set desintation icon to source icon
+				tilebutton[destR][destC].setIcon(tilebutton[srcR][srcC].getIcon());
+			
+				//Set source icon to nothing
+				tilebutton[srcR][srcC].setIcon(null);
+		}
+		
+		private boolean isSourceClick()
+		{
+			if (srcR >-1 && srcC >-1)
+				return true;
+			else
+				return false;
+		}
+		
+		private void clearSourceClick()
+		{
+			srcR = -1;
+			srcC = -1;
+			b.setSourcePiece(srcR,srcC);
+		}
+		
+		private void setSourceClick(int r, int c)
+		{
+			srcR = r;
+			srcC = c;
+			b.setSourcePiece(srcR,srcC);
+		}
+
+	}
+	
+	//When new game is pressed
+	private class NewGameButtonListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+	
+		{
+			b = new Board();
+ 
+			setInitIcon();
+
+			verboseBox.setText("");
+			addMessage("[VERBOSE]");
+		}
+	}
+	
+	//When exit is clicked
+	private class ExitGameButtonListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			System.exit(0);
+		}
+	}
+	
+	//Show the text box
+	private class VerboseButtonListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			if (verboseMenuItem.isSelected())
+				verbosePanel.setVisible(true);
+			else
+				verbosePanel.setVisible(false);
+		}
+	}
+	
+	//Add message to text box
+	private void addMessage(String s)
+	{
+		verboseBox.append(s + newline);
+		
+		//Move ScrollBox with Added Text
+		verboseBox.setCaretPosition(verboseBox.getDocument().getLength());
+	}
+	
+	//Set icons to starting positions
+	private void setInitIcon()
+	{
+		//Rook
+		tilebutton[0][0].setIcon(tileIcon[5]);
+		tilebutton[0][7].setIcon(tileIcon[5]);
+		tilebutton[7][0].setIcon(tileIcon[11]);
+		tilebutton[7][7].setIcon(tileIcon[11]);
+		
+		//Knight
+		tilebutton[0][1].setIcon(tileIcon[2]);
+		tilebutton[0][6].setIcon(tileIcon[2]);
+		tilebutton[7][1].setIcon(tileIcon[8]);
+		tilebutton[7][6].setIcon(tileIcon[8]);
+		
+		//Bishop
+		tilebutton[0][2].setIcon(tileIcon[0]);
+		tilebutton[0][5].setIcon(tileIcon[0]);
+		tilebutton[7][2].setIcon(tileIcon[6]);
+		tilebutton[7][5].setIcon(tileIcon[6]);
+		
+		//Queen
+		tilebutton[0][4].setIcon(tileIcon[4]);
+		tilebutton[7][4].setIcon(tileIcon[10]);
+		
+		//King
+		tilebutton[0][3].setIcon(tileIcon[1]);
+		tilebutton[7][3].setIcon(tileIcon[7]);
+	
+		//Pawn & blanks.
+		for(int i=0;i<8;i++)
+		{
+			tilebutton[1][i].setIcon(tileIcon[3]);
+			tilebutton[6][i].setIcon(tileIcon[9]);
+			tilebutton[2][i].setIcon(null);
+			tilebutton[3][i].setIcon(null);
+			tilebutton[4][i].setIcon(null);
+			tilebutton[5][i].setIcon(null);
+		}
+		
+	}
+	
+} 
+
+===========
+===========
+
+import java.util.ArrayList;
+import java.util.Iterator;
+	
+public class Board
+{
+	private Piece chessBoard[][];
+	private Piece.color turn;
+	private boolean inCheck;
+	private boolean inCheckMate;
+	private Piece srcPiece;
+	private AI a;
+	
+	private ArrayList<Piece> whitePieceList;
+	private ArrayList<Piece> blackPieceList;
+
+	
+	public Board()
+	{
+		//Computer Black Pieces
+		// a = new AI(Piece.color.black);
+				
+		//White first
+		turn = Piece.color.white; 
+		
+		//Create Board With Pieces On It
+		chessBoard = new Piece[8][8];
+
+		//White
+		chessBoard[0][0] = new Rook(Piece.color.white,0,0);
+		chessBoard[0][1] = new Knight(Piece.color.white,0,1);
+		chessBoard[0][2] = new Bishop(Piece.color.white,0,2);
+		chessBoard[0][3] = new King(Piece.color.white,0,3);
+		chessBoard[0][4] = new Queen(Piece.color.white,0,4);
+		chessBoard[0][5] = new Bishop(Piece.color.white,0,5);
+		chessBoard[0][6] = new Knight(Piece.color.white,0,6);
+		chessBoard[0][7] = new Rook(Piece.color.white,0,7);
+		
+		//Black
+		chessBoard[7][0] = new Rook(Piece.color.black,7,0);
+		chessBoard[7][1] = new Knight(Piece.color.black,7,1);
+		chessBoard[7][2] = new Bishop(Piece.color.black,7,2);
+		chessBoard[7][3] = new King(Piece.color.black,7,3);
+		chessBoard[7][4] = new Queen(Piece.color.black,7,4);
+		chessBoard[7][5] = new Bishop(Piece.color.black,7,5);
+		chessBoard[7][6] = new Knight(Piece.color.black,7,6);
+		chessBoard[7][7] = new Rook(Piece.color.black,7,7);
+
+		//Set pawns up and blank spaces
+		for (int i = 0; i < 8; i++)
+		{
+			chessBoard[1][i] = new Pawn(Piece.color.white,1,i);
+			chessBoard[6][i] = new Pawn(Piece.color.black,6,i);
+			chessBoard[2][i] = null;
+			chessBoard[3][i] = null;
+			chessBoard[4][i] = null;
+			chessBoard[5][i] = null;
+		}
+	}
+	
+	//Copy Constructor
+	public Board(Board b)
+	{
+		this();
+	}
+	
+	public boolean checkFirstClick(int r, int c) throws Exception
+	{
+
+		if ( isEmpty(r,c))
+		{
+			throw new Exception("No one home! Try clicking an occupied piece!");
+		}
+		
+		if ( !(isMyColor(r,c)))
+		{
+			throw new Exception("Bad color! Try clicking your own color!");
+		}
+		
+		
+		
+		return true; //SetSrcPiece
+	}
+	
+	public void setSrcPiece(int r, int c)
+	{
+		srcPiece = chessBoard[r][c];
+	}
+	
+	public boolean checkSecondClick(int destR, int destC) throws Exception
+	{
+		//Is trying to capture own piece?
+		if (!(this.isEmpty(destR,destC)) && this.isMyColor(destR,destC))
+		{
+			throw new Exception("No cannibalizm! Try capturing your own pieces!");
+		}
+		
+		//Is legal move?
+		if( !(chessBoard[destR][destC].legalMove(m, chessBoard)))
+		{
+			throw new Exception("This is chess! Try a legal move!");
+		}
+		
+
+		
+		//Test board with supposed move
+		Board copyBoard = this.createTestScenario(destR,destC);
+
+		
+		//If in check, does this move take me out of check?
+		if(this.checkCheck(this,turn))
+		{
+			if(this.checkCheck(copyBoard,turn))
+			{
+				throw new Exception("Still in Check! This move doesn't save the KING!");
+			}	
+		}
+		
+		//If not in check, Does this move put ME in check?
+		if( !(this.checkCheck(copyBoard,turn)))
+		{
+			if(this.checkCheck(copyBoard,turn))
+			{
+				throw new Exception("Don't put your King in Danger! This move will put YOU in check!");
+			}	
+		}	
+	
+		return true; //MakeMove
+	}
+	
+	public boolean isCheckMate()
+	{
+
+	}
+	
+	public Board createTestScenario(int destR, int destC)
+	{
+		//Copy Board
+		Board copyBoard = new Board(this);
+		
+		//Make Move on Copy Board
+		copyBoard.makeMove(destR, destC);
+		
+		return copyBoard;
+	}
+	
+	public boolean makeMove(int destR, int destC) 
+	{
+		int srcR = srcPiece.getSrcR();
+		int srcC = srcPiece.getSrcC();
+		
+		//Move piece
+		chessBoard[destR][destC] = chessBoard[srcR][srcC];
+		
+		//Set source to empty
+		chessBoard[srcR][srcC] = null;
+		
+		//Update piece position
+		chessBoard[destR][destC].setSrcC(destC);
+		chessBoard[destR][destC].setSrcR(destR);
+		
+		toggleTurn();
+				
+		return true;
+	}
+	
+	private boolean isEmpty(int r, int c)
+	{
+		if (chessBoard[r][c] == null)
+			return true;
+		else
+			return false;
+	}
+	
+	private boolean isMyColor(int r, int c)
+	{
+		if (chessBoard[r][c].getColor() == turn)
+			return true;
+		else
+			return false;
+	}
+	
+	//Change player turn
+	private void toggleTurn()
+	{
+		if (turn == Piece.color.white)
+			turn = Piece.color.black;
+		else
+			turn = Piece.color.white;
+	}
+	
+	private boolean checkCheck(Piece[][] board,Piece.color color)
+	{
+		ArrayList<Piece> enemyPieces = new ArrayList<Piece>();
+		int kingSrcR=-1;
+		int kingSrcC=-1;
+		
+		//Fill List
+		for (int i=0;i<8;i++)
+		{
+			for(int j=0;j<8;j++)
+			{
+				//Skip Null Tiles
+				if (board[i][j] == null)
+					continue;
+				
+				//Add King Src ACcording to Turn
+				if (board[i][j].getColor() == color && board[i][j].getName() == Piece.name.king)
+				{
+					kingSrcR = board[i][j].getSrcR();
+					kingSrcC = board[i][j].getSrcC();				
+				}
+			
+				//Add Enemy Pieces
+				if(board[i][j].getColor() != color)
+					enemyPieces.add(board[i][j]);
+				
+			}
+		}
+		
+		//CheckMate
+		
+		
+		Iterator<Piece> itPiece = enemyPieces.listIterator();
+		while (itPiece.hasNext())
+		{
+			Piece p = itPiece.next();
+			if(p.legalMove(kingSrcR, kingSrcC, board))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean isSourcePieceSet()
+	{
+		if (srcPiece == null)
+			return false;
+		else
+			return true;
+	}
+	
+
+}
