@@ -5,26 +5,19 @@ public abstract  class Piece
 {
 	protected int srcR,srcC;
 	protected Name name;
-	protected  Color color;
+	protected Color color;
 	protected Side side;
 	
 	public enum Name{pawn,knight,bishop,rook,queen,king,invalid};
 	public enum Color{black,white,invalid};
 	public enum Side{queenside,kingside,invalid};
 	
-	
+//Constructor	
 	public Piece(Piece.Color color, int srcR, int srcC)
 	{
 		this.color = color;
 		this.srcR = srcR;
 		this.srcC = srcC;
-		this.setSide(srcC);
-	}
-	
-//Copy Constructor
-	public Piece(Piece p)
-	{
-		this(p.getColor(),p.getSrcR(),p.getSrcC());
 	}
 
 //Mutator
@@ -37,6 +30,8 @@ public abstract  class Piece
 	 {
 		 this.srcR = srcR;
 	 }
+
+	
 //Accessor 
 	 public int getSrcC()
 	 {
@@ -58,21 +53,17 @@ public abstract  class Piece
 		return side;
 	}
 	
+
+	public Piece.Name getName()
+	{
+		return name;
+	}
+	
 //Methods	
 	
 	public abstract ArrayList <Move> genMoves(Board b);
 	
 	public abstract boolean legalMove(int destR, int destC, Board b);
-	
-	public void setSide(int srcC)
-	{
-		if(srcC == 3 || srcC == 4)
-			side = Side.invalid;
-		else if (srcC >= 0 || srcC <= 2)
-			side = Side.queenside;
-		else if (srcC >=5 || srcC <= 7)
-			side = Side.kingside;
-	}
 	
 	protected boolean legalMove(Move move, Board b)
 	{
@@ -94,13 +85,6 @@ public abstract  class Piece
 		return false;
 	}
 
-	 
-
-	public Piece.Name getName()
-	{
-		return name;
-	}
-	
 	public Piece.Color getEnemyColor()
 	{
 		//Get color of attacker
@@ -109,9 +93,10 @@ public abstract  class Piece
 		else
 			return Piece.Color.white;
 	}
+
 	
-	//Is this square under attack by enemy 
-	public boolean isUnderAttack(Board b)
+	//Is this src/destination square under attack by enemy 
+	public boolean isSrcUnderAttack(Board b)
 	{
 		ArrayList<Piece> pieceList;
 		Piece enemy;
@@ -129,10 +114,43 @@ public abstract  class Piece
 		while (itPiece.hasNext())
 		{
 			 enemy = itPiece.next();
+			 
+			//If the enemy piece can legal move to src
 			if( enemy.legalMove(srcR, srcC, b))
-			{
-				return true;
-			}
+				return true; 
+		}
+		
+		return false;	
+	}
+	
+	public boolean isUnderAttackAfterMove(Board b,int destR,int destC)
+	{
+		ArrayList<Piece> pieceList;
+		Piece enemy;
+		Iterator<Piece> itPiece; 
+		Piece.Color enemyColor;
+		Board B;
+		
+		//Board
+		B = new Board(b);
+		
+		B.makeMove(srcR,srcC,destR,destC);
+		
+		//Find enemy color
+		enemyColor = this.getEnemyColor();
+		
+		//Get enemy piece list
+		pieceList = B.getPieceList(enemyColor);
+
+		//See if any piece can legally capture 
+	    itPiece = pieceList.listIterator();
+		while (itPiece.hasNext())
+		{
+			 enemy = itPiece.next();
+			 
+			//If the enemy piece can legal move to dest
+			if( enemy.legalMove(destR, destC, b))
+				return true; 
 		}
 		
 		return false;	

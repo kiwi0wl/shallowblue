@@ -9,7 +9,13 @@ final public class King extends Piece
 	{
 		super(color,srcR,srcC);
 		
-		name = Name.king;
+		this.name = Name.king;
+		this.side = Piece.Side.invalid;
+	}
+	
+	public King(Piece p)
+	{
+		this(p.getColor(),p.getSrcR(),p.getSrcC());
 	}
 	
 	public  boolean legalMove(int destR, int destC, Board b)
@@ -33,42 +39,42 @@ final public class King extends Piece
 			}
 			
 			//East
-			if(srcR == destR && srcC < destC)
+			else if(srcR == destR && srcC < destC)
 			{
 				testC++;
 			}
 			
 			//North
-			if(srcR > destR && srcC == destC)
+			else if(srcR > destR && srcC == destC)
 			{
 				testR--;
 			}
 			
 			//South
-			if(srcR < destR && srcC == destC)
+			else if(srcR < destR && srcC == destC)
 			{
 				testR++;
 			}
 				
-			if (srcR > destR && srcC < destC) //NorthEast
+			else if (srcR > destR && srcC < destC) //NorthEast
 			{
 				testR--;
 				testC++;
 			}
 			
-			if (srcR > destR && srcC > destC) //NorthWest
+			else if (srcR > destR && srcC > destC) //NorthWest
 			{
 				testR--;
 				testC--;
 			}
 			
-			if (srcR < destR && srcC > destC) //SouthWest
+			else if (srcR < destR && srcC > destC) //SouthWest
 			{
 				testR++;
 				testC--;
 			}
 			
-			if (srcR < destR && srcC < destC) //SouthEast
+			else if (srcR < destR && srcC < destC) //SouthEast
 			{
 				testR++;
 				testC++;
@@ -81,8 +87,8 @@ final public class King extends Piece
 			}
 			
 			
-			//If tile under attack
-			if(this.isUnderAttack(b))
+			//If king under attack at dest.
+			if(this.isUnderAttackAfterMove(b,destR,destC))
 			{
 				return false;
 			}
@@ -180,12 +186,12 @@ final public class King extends Piece
 				}
 				
 			
-				//If tile under attack
-				if(this.isUnderAttack(b))
+				//If tile under attack at dest
+				if(this.isUnderAttackAfterMove(b,testR,testC))
 				{
 					break;
 				}
-				
+		
 				
 				//Square Occupied
 				if ( (p = b.getPiece(testR, testC)) != null)
@@ -224,8 +230,8 @@ final public class King extends Piece
 	
 	public boolean inCheck(Board b)
 	{
-		//If King Under Attack
-		if(this.isUnderAttack(b))
+		//If King Under Attack at Src
+		if(this.isSrcUnderAttack(b))
 			return true;
 		else
 			return false;
@@ -278,17 +284,14 @@ final public class King extends Piece
 						B.makeMove(m);
 						
 						//Get the King
-						king = (King) b.getPiece(Piece.Name.king, color,Piece.Side.invalid);
+						king = (King) B.getPiece(Piece.Name.king, color,Piece.Side.invalid);
 						
 						//If king still in check, try another block
 						if(king.inCheck(B))
-						{
 							continue;
-						}
 						else //Out of check = no check mate
-						{
 							return false;
-						}
+						
 					} //Move Loop
 				} //Piece Loop
 				return true;

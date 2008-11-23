@@ -10,14 +10,20 @@ final public class Pawn extends Piece
 		super(color,srcR,srcC);
 		
 		name = Name.pawn;
+
 		
-		if (srcR == 1)
+		if (color == Piece.Color.black)
 			upOrDown = "down";
 		else
 			upOrDown = "up";
 		
 		firstMove = true;
 		
+	}
+	
+	public Pawn(Piece p)
+	{
+		this(p.getColor(),p.getSrcR(),p.getSrcC());
 	}
 	
 	public boolean legalMove(int destR,int destC, Board b)
