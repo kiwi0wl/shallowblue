@@ -5,7 +5,14 @@ final public class Queen extends Piece
 	public Queen(Piece.Color color, int srcR,int srcC)
 	{
 		super(color,srcR,srcC);
-		name = Name.queen;
+		
+		this.name = Name.queen;
+		this.side = Piece.Side.invalid;
+	}
+	
+	public Queen(Piece p)
+	{
+		this(p.getColor(),p.getSrcR(),p.getSrcC());
 	}
 	
 

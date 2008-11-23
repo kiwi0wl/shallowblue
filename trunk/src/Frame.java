@@ -264,8 +264,7 @@ public class Frame extends JFrame
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			clearHighlight(srcPiece.getSrcR(),srcPiece.getSrcC());
-			
+			clearAllHighlights();
 			b = new Board();
  
 			setInitIcon();
@@ -331,6 +330,16 @@ public class Frame extends JFrame
 			b.makeMove(srcR, srcC, destR, destC);
 			this.updateIcons(srcR,srcC,destR,destC);
 			this.clearHighlight(srcR,srcC);
+			
+			if (this.isGameOver())
+				{
+				Container c = getContentPane();
+				 JOptionPane.showMessageDialog(c, turn.name().toUpperCase() + " WINS!", "WINNER!", 1);
+					this.disableButtons();
+					this.addMessage(turn.name().toUpperCase() + " WINS!");
+					return;
+				}
+			
 			this.resetMove();
 			this.toggleTurn();
 		}
@@ -360,38 +369,29 @@ public class Frame extends JFrame
 	
 	private boolean validateDest(int destR, int destC)
 	{
-		//Create test board with the destination move
 		Board copyBoard;
 		King realKing;
 		King copyKing;
-		Move m;
 	
 		//Is trying to capture own piece?
 		if ( (destPiece != null) && (destPiece.getColor() == turn) )
 		{
-			this.addMessage("No cannibalizm! Try capturing your own pieces!");
+			this.addMessage("No cannibalizm! Try capturing your enemy's pieces!");
 			return false;
 		}
-///*		
+
 		//Is legal move?
 		if( !(srcPiece.legalMove(destR,destC, b)))
 		{
 			this.addMessage("This is chess! Try a legal move!");
 			return false;
 		}
-//*/
-/*	
-		m = new Move(srcPiece.getSrcR(),srcPiece.getSrcC(),destR,destC);
-		//Not Effective
-		if( !(srcPiece.legalMove(destR,destC, b)))
-		{
-			this.addMessage("This is chess! Try a legal move!");
-			return false;
-		}
-*/		
-/*
+		
+		//Create a test board with this move
  		copyBoard = new Board(b);
  		copyBoard.makeMove(srcPiece.getSrcR(), srcPiece.getSrcC(), destR, destC);
+ 		
+ 		//Get the kings from real board and test board
  		copyKing = (King) copyBoard.getPiece(Piece.Name.king, turn, Piece.Side.invalid);
  		realKing = (King) b.getPiece(Piece.Name.king, turn, Piece.Side.invalid);
  		
@@ -414,9 +414,28 @@ public class Frame extends JFrame
 				return false;
 			}	
 		}	
-*/		
+		
 		return true;
 		
+	}
+	
+	//Is the enemy is in check mate
+	public boolean isGameOver()
+	{
+		King myKing;
+		King enemyKing;
+		Piece.Color enemyColor;
+		
+		myKing = (King) b.getPiece(Piece.Name.king, turn, Piece.Side.invalid);
+		enemyColor = myKing.getEnemyColor();
+		enemyKing = (King) b.getPiece(Piece.Name.king, enemyColor, Piece.Side.invalid);
+		
+		if(enemyKing.inCheckMate(b))
+		{
+			return true;
+		}
+		
+		return false;
 	}
 	
 	private void addMessage(String s)
@@ -436,6 +455,18 @@ public class Frame extends JFrame
 	{
 			tilebutton[srcR][srcC].setBorder(null);	
 	}
+	
+	private void clearAllHighlights()
+	{
+		for (int i=0;i<8;i++)
+		{
+			for(int j=0;j<8;j++)
+			{
+				tilebutton[i][j].setBorder(null);	
+			}
+		}
+	}
+	
 	
 	private void resetMove()
 	{
@@ -465,6 +496,17 @@ public class Frame extends JFrame
 		
 			//Set source icon to nothing
 			tilebutton[srcR][srcC].setIcon(null);
+	}
+	
+	private void disableButtons()
+	{
+		for (int i=0;i<8;i++)
+		{
+			for(int j=0;j<8;j++)
+			{
+				tilebutton[i][j].setEnabled(false);
+			}
+		}
 	}
 
 	

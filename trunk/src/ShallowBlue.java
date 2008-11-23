@@ -1,12 +1,11 @@
-import java.util.ArrayList;
-
 public class ShallowBlue 
 {
 	public static void main(String[] args)
 	{
 		Frame frame = new Frame();
 		frame.setVisible(true);
-/*
+
+	/*
 		Board b = new Board();
 		b.makeMove(0, 2, 2, 0);
 		Piece p = b.getPiece(2, 0);

@@ -2,10 +2,17 @@ import java.util.ArrayList;
 
 final public class Bishop extends Piece
 {
-	public Bishop(Piece.Color color, int srcR, int srcC)
+	public Bishop(Piece.Color color, int srcR, int srcC,Piece.Side side)
 	{
 		super(color,srcR,srcC);
-		name = Name.bishop;		
+		this.name = Name.bishop;	
+		this.side = side;
+
+	}
+	
+	public Bishop(Piece p)
+	{
+		this(p.getColor(),p.getSrcR(),p.getSrcC(),p.getSide());
 	}
 	
 	public  boolean legalMove(int destR, int destC, Board b)
