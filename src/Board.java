@@ -104,7 +104,7 @@ public class Board
 	}
 	
 	//Return piece by name and color and side
-	public Piece getPiece(Piece.Name name,Piece.Color color, Piece.Side side)
+	public King getKing(Piece.Color color)
 	{
 		ArrayList<Piece> pieceList;
 		Iterator<Piece> itPiece;
@@ -116,9 +116,9 @@ public class Board
 		while (itPiece.hasNext())
 		{
 			 p = itPiece.next();
-			if(p.getName() == name && p.getColor() == color && p.getSide() == side)
+			if(p.getName() == Piece.Name.king && p.getColor() == color)
 			{
-				return p;
+				return (King)p;
 			}
 		}
 		

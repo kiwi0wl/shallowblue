@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public abstract  class Piece
+public abstract class Piece
 {
 	protected int srcR,srcC;
 	protected Name name;
@@ -92,68 +92,6 @@ public abstract  class Piece
 			return Piece.Color.black;
 		else
 			return Piece.Color.white;
-	}
-
-	
-	//Is this src/destination square under attack by enemy 
-	public boolean isSrcUnderAttack(Board b)
-	{
-		ArrayList<Piece> pieceList;
-		Piece enemy;
-		Iterator<Piece> itPiece; 
-		Piece.Color enemyColor;
-		
-		//Find enemy color
-		enemyColor = this.getEnemyColor();
-		
-		//Get enemy piece list
-		pieceList = b.getPieceList(enemyColor);
-
-		//See if any piece can legally capture 
-	    itPiece = pieceList.listIterator();
-		while (itPiece.hasNext())
-		{
-			 enemy = itPiece.next();
-			 
-			//If the enemy piece can legal move to src
-			if( enemy.legalMove(srcR, srcC, b))
-				return true; 
-		}
-		
-		return false;	
-	}
-	
-	public boolean isUnderAttackAfterMove(Board b,int destR,int destC)
-	{
-		ArrayList<Piece> pieceList;
-		Piece enemy;
-		Iterator<Piece> itPiece; 
-		Piece.Color enemyColor;
-		Board B;
-		
-		//Board
-		B = new Board(b);
-		
-		B.makeMove(srcR,srcC,destR,destC);
-		
-		//Find enemy color
-		enemyColor = this.getEnemyColor();
-		
-		//Get enemy piece list
-		pieceList = B.getPieceList(enemyColor);
-
-		//See if any piece can legally capture 
-	    itPiece = pieceList.listIterator();
-		while (itPiece.hasNext())
-		{
-			 enemy = itPiece.next();
-			 
-			//If the enemy piece can legal move to dest
-			if( enemy.legalMove(destR, destC, b))
-				return true; 
-		}
-		
-		return false;	
 	}
 	
 }

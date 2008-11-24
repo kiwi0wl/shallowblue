@@ -21,6 +21,7 @@ final public class King extends Piece
 	public  boolean legalMove(int destR, int destC, Board b)
 	{
 		Piece p;
+		King k;
 		int testR = srcR;
 		int testC = srcC;
 		
@@ -87,10 +88,19 @@ final public class King extends Piece
 			}
 			
 			
-			//If king under attack at dest.
-			if(this.isUnderAttackAfterMove(b,destR,destC))
+			//Copy board
+			Board B = new Board(b);
+			
+			//Make move
+			B.makeMove(srcR, srcC, testR, testC);
+			
+			//Get King 
+			k = B.getKing(color);
+			
+			//In check?
+			if(k.inCheck(B))
 			{
-				return false;
+				break;
 			}
 			
 			
@@ -122,6 +132,8 @@ final public class King extends Piece
 				return true;
 			}
 		}
+		
+		return false;
 
 	}
 	
@@ -129,6 +141,7 @@ final public class King extends Piece
 	{
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		Piece p;
+		King k;
 		int direction =0;
 		
 		while(direction <8)
@@ -186,8 +199,17 @@ final public class King extends Piece
 				}
 				
 			
-				//If tile under attack at dest
-				if(this.isUnderAttackAfterMove(b,testR,testC))
+				//Copy board
+				Board B = new Board(b);
+				
+				//Make move
+				B.makeMove(srcR, srcC, testR, testC);
+				
+				//Get King 
+				k = B.getKing(color);
+				
+				//In check?
+				if(k.inCheck(B))
 				{
 					break;
 				}
@@ -230,11 +252,29 @@ final public class King extends Piece
 	
 	public boolean inCheck(Board b)
 	{
-		//If King Under Attack at Src
-		if(this.isSrcUnderAttack(b))
-			return true;
-		else
-			return false;
+		ArrayList<Piece> pieceList;
+		Piece enemy;
+		Iterator<Piece> itPiece; 
+		Piece.Color enemyColor;
+		
+		//Find enemy color
+		enemyColor = this.getEnemyColor();
+		
+		//Get enemy piece list
+		pieceList = b.getPieceList(enemyColor);
+
+		//See if any piece can legally capture 
+	    itPiece = pieceList.listIterator();
+		while (itPiece.hasNext())
+		{
+			 enemy = itPiece.next();
+			 
+			//If the enemy piece can legal move to king
+			if( enemy.legalMove(srcR, srcC, b))
+				return true; 
+		}
+		
+		return false;	
 	}
 	
 	public boolean inCheckMate(Board b)
@@ -284,7 +324,7 @@ final public class King extends Piece
 						B.makeMove(m);
 						
 						//Get the King
-						king = (King) B.getPiece(Piece.Name.king, color,Piece.Side.invalid);
+						king = B.getKing(color);
 						
 						//If king still in check, try another block
 						if(king.inCheck(B))

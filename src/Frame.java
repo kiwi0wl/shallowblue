@@ -1,5 +1,7 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 public class Frame extends JFrame 
@@ -269,10 +271,13 @@ public class Frame extends JFrame
  
 			setInitIcon();
 			
+			enableButtons();
+			
 			srcPiece = null;
 			destPiece = null;
 			
 			turn = Piece.Color.white;
+			whitePlayer.setSelected(true);
 
 			verboseBox.setText("");
 			addMessage("[VERBOSE]");
@@ -331,14 +336,33 @@ public class Frame extends JFrame
 			this.updateIcons(srcR,srcC,destR,destC);
 			this.clearHighlight(srcR,srcC);
 			
-			if (this.isGameOver())
-				{
+			if (this.isCheckmate())
+			{
+				//Show dialog box
 				Container c = getContentPane();
-				 JOptionPane.showMessageDialog(c, turn.name().toUpperCase() + " WINS!", "WINNER!", 1);
-					this.disableButtons();
-					this.addMessage(turn.name().toUpperCase() + " WINS!");
-					return;
-				}
+				JOptionPane.showMessageDialog(c, turn.name().toUpperCase() + " WINS!", "WINNER!", 1);
+					
+				//Disable all buttons
+				this.disableButtons();
+					
+				//Add Message
+				this.addMessage(turn.name().toUpperCase() + " WINS!");
+				return;
+			}
+			
+			if(this.isStalemate())
+			{
+				//Show dialog box
+				Container c = getContentPane();
+				JOptionPane.showMessageDialog(c, "Draw", "Draw", 1);
+					
+				//Disable all buttons
+				this.disableButtons();
+					
+				//Add Message
+				this.addMessage("The game is a draw!");
+				return;
+			}
 			
 			this.resetMove();
 			this.toggleTurn();
@@ -369,9 +393,10 @@ public class Frame extends JFrame
 	
 	private boolean validateDest(int destR, int destC)
 	{
-		Board copyBoard;
+		Board testBoard;
 		King realKing;
-		King copyKing;
+		King testKing;
+		boolean checkStatusReal,checkStatusTest;
 	
 		//Is trying to capture own piece?
 		if ( (destPiece != null) && (destPiece.getColor() == turn) )
@@ -387,18 +412,25 @@ public class Frame extends JFrame
 			return false;
 		}
 		
-		//Create a test board with this move
- 		copyBoard = new Board(b);
- 		copyBoard.makeMove(srcPiece.getSrcR(), srcPiece.getSrcC(), destR, destC);
+		//Create a test board 
+ 		testBoard = new Board(b);
  		
- 		//Get the kings from real board and test board
- 		copyKing = (King) copyBoard.getPiece(Piece.Name.king, turn, Piece.Side.invalid);
- 		realKing = (King) b.getPiece(Piece.Name.king, turn, Piece.Side.invalid);
+ 		//Make move on this board
+ 		testBoard.makeMove(srcPiece.getSrcR(), srcPiece.getSrcC(), destR, destC);
+ 		
+ 		//Get the kings
+ 		testKing = (King) testBoard.getKing(turn);
+ 		realKing = (King) b.getKing(turn);
+ 		
+ 		//Get check status
+ 		checkStatusReal = realKing.inCheck(b);
+ 		checkStatusTest = testKing.inCheck(testBoard);
+ 		
  		
 		//If in check, does this move take me out of check?
-		if(realKing.inCheck(b))
+		if(checkStatusReal)
 		{
-			if(copyKing.inCheck(copyBoard))
+			if(checkStatusTest)
 			{
 				this.addMessage("Still in Check! This move doesn't save the KING!");
 				return false;
@@ -406,9 +438,9 @@ public class Frame extends JFrame
 		}
 		
 		//If not in check, Does this move put ME in check?
-		if( !(realKing.inCheck(b)))
+		if( !(checkStatusReal))
 		{
-			if(copyKing.inCheck(copyBoard))
+			if(checkStatusTest)
 			{
 				this.addMessage("Don't put your King in Danger! This move will put YOU in check!");
 				return false;
@@ -420,15 +452,18 @@ public class Frame extends JFrame
 	}
 	
 	//Is the enemy is in check mate
-	public boolean isGameOver()
+	public boolean isCheckmate()
 	{
 		King myKing;
 		King enemyKing;
 		Piece.Color enemyColor;
 		
-		myKing = (King) b.getPiece(Piece.Name.king, turn, Piece.Side.invalid);
-		enemyColor = myKing.getEnemyColor();
-		enemyKing = (King) b.getPiece(Piece.Name.king, enemyColor, Piece.Side.invalid);
+		if(turn == Piece.Color.white)
+			enemyColor = Piece.Color.black;
+		else
+			enemyColor = Piece.Color.white;
+		
+		enemyKing = (King) b.getKing(enemyColor);
 		
 		if(enemyKing.inCheckMate(b))
 		{
@@ -436,6 +471,20 @@ public class Frame extends JFrame
 		}
 		
 		return false;
+	}
+	
+	public boolean isStalemate()
+	{
+		ArrayList<Piece> list1;
+		ArrayList<Piece> list2;
+		
+		list1 = b.getPieceList(Piece.Color.black);
+		list2 = b.getPieceList(Piece.Color.white);
+		
+		if(list1.size() == 1 && list2.size() == 1)
+			return true;
+		else
+			return false;
 	}
 	
 	private void addMessage(String s)
@@ -505,6 +554,17 @@ public class Frame extends JFrame
 			for(int j=0;j<8;j++)
 			{
 				tilebutton[i][j].setEnabled(false);
+			}
+		}
+	}
+	
+	private void enableButtons()
+	{
+		for (int i=0;i<8;i++)
+		{
+			for(int j=0;j<8;j++)
+			{
+				tilebutton[i][j].setEnabled(true);
 			}
 		}
 	}
