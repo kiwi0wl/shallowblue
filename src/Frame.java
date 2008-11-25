@@ -15,7 +15,7 @@ public class Frame extends JFrame
 	//Menu 
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
-	private JMenuItem newMenuItem,exitMenuItem;
+	private JMenuItem p1MenuItem,p2MenuItem,exitMenuItem;
 	private JCheckBoxMenuItem verboseMenuItem;
 	
 	//Hold Player Info/Check Info
@@ -50,6 +50,8 @@ public class Frame extends JFrame
 	//Board Object
 	private Game game;
 	
+	private int numPlayers;
+	
 	public Frame()
 	{
 		//Set the FrameUp,
@@ -70,8 +72,11 @@ public class Frame extends JFrame
 		fileMenu = new JMenu("File");
 		
 			//Add the New Game Item and Listener
-			newMenuItem  = new JMenuItem("New");
-			newMenuItem.addActionListener(new NewGameButtonListener());
+			p1MenuItem  = new JMenuItem("1 Player");
+			p1MenuItem.addActionListener(new NewOnePlayerGameButtonListener());
+			
+			p2MenuItem  = new JMenuItem("2 Player");
+			p2MenuItem.addActionListener(new NewTwoPlayerGameButtonListener());
 			
 			//Add the Verbose Option and Listener
 			verboseMenuItem = new JCheckBoxMenuItem("Verbose", false);
@@ -82,7 +87,8 @@ public class Frame extends JFrame
 			exitMenuItem.addActionListener(new ExitGameButtonListener());
 
 			//Add all Menu Items to Menu
-			fileMenu.add(newMenuItem);
+			fileMenu.add(p1MenuItem);
+			fileMenu.add(p2MenuItem);
 			fileMenu.add(verboseMenuItem);
 			fileMenu.add(exitMenuItem);
 			 
@@ -129,16 +135,16 @@ public class Frame extends JFrame
 			//Don't let user enter text
 			verboseBox.setEditable(false);
 			
-			//Create scroll area from the textarea
+			//Create scroll area from the text area
 			verboseScroll = new JScrollPane(verboseBox);
 		
-			//Never Show the Horizontal scrollbar
+			//Never Show the Horizontal scroll bar
 			verboseScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
-			//Add Scrollbox to verbose panel
+			//Add scroll box to verbose panel
 			verbosePanel.add(verboseScroll);
 		
-			//Hide scrollbox at startup
+			//Hide scroll box at startup
 			verbosePanel.setVisible(false);
 		
 	
@@ -226,8 +232,7 @@ public class Frame extends JFrame
 		//Set icons 
 		this.setInitIcon();
 		
-		//New game
-		game = new Game(this);
+		this.disableButtons();
 	}
 	
 //Listeners
@@ -243,29 +248,30 @@ public class Frame extends JFrame
 			r = Integer.parseInt(s.substring(0, 1));
 			c = Integer.parseInt(s.substring(1));
 			
+			
 			game.click(r, c);
+			
+			if(blackPlayer.isSelected())
+				game.AIMove();
 			
 		}	
 	}
 	
-	//When new game is pressed
-	private class NewGameButtonListener implements ActionListener
+	//1 Player
+	private class NewOnePlayerGameButtonListener implements ActionListener
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			clearAllHighlights();
-			
-			WTF();
- 
-			setInitIcon();
-			
-			enableButtons();
-
-			whitePlayer.setSelected(true);
-
-			verboseBox.setText("");
-			
-			addMessage("[VERBOSE]");
+			createGame(1); //Get Rid Method
+		}
+	}
+	
+	//2Player
+	private class NewTwoPlayerGameButtonListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			createGame(2); //Get Rid Method
 		}
 	}
 	
@@ -306,14 +312,24 @@ public class Frame extends JFrame
 		JOptionPane.showMessageDialog(c, message, title, 1);
 	}
 	
-	public void setHighlight(int srcR, int srcC)
+	public void setHighlight(Move m)
 	{
-			tilebutton[srcR][srcC].setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.blue));
+		int srcR,srcC;
+		
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		
+		tilebutton[srcR][srcC].setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.blue));
 	}
 	
-	public void clearHighlight(int srcR, int srcC)
+	public void clearHighlight(Move m)
 	{
-			tilebutton[srcR][srcC].setBorder(null);	
+		int srcR,srcC;
+		
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+			
+		tilebutton[srcR][srcC].setBorder(null);	
 	}
 	
 	public void clearAllHighlights()
@@ -330,18 +346,20 @@ public class Frame extends JFrame
 	public void toggleTurn()
 	{
 		if(whitePlayer.isSelected())
-		{
 			blackPlayer.setSelected(true);
-		}
 		else
-		{
 			whitePlayer.setSelected(true);
-		}
 	}
 	
-	public void updateIcons(int srcR, int srcC, int destR, int destC)
+	public void updateIcons(Move m)
 	{	
-
+		int srcR,srcC,destR,destC;
+		
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		destR = m.getDestR();
+		destC = m.getDestC();
+		
 			//Set desintation icon to source icon
 			tilebutton[destR][destC].setIcon(tilebutton[srcR][srcC].getIcon());
 		
@@ -429,9 +447,26 @@ public class Frame extends JFrame
 		
 	}
 	
-	public void  WTF()
+	public void  createGame(int numPlayers)
 	{
-		game = new Game(this);
+		clearAllHighlights();
+
+		game = new Game(this,numPlayers);
+		
+		setInitIcon();
+		
+		enableButtons();
+
+		whitePlayer.setSelected(true);
+
+		verboseBox.setText("");
+		
+		addMessage("[VERBOSE]");
+		
+		if(numPlayers == 1)
+			addMessage("1 Player Game");
+		else
+			addMessage("2 Player Game");
 	}
 	
 } 

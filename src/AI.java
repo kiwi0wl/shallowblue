@@ -22,8 +22,9 @@ public class AI {
 	}
 	
 	
-	public Move makeMove(Board b)
+	public void makeMove(Game g,Board b)
 	{
+/*
 		ArrayList<Piece> pieceList;
 		ArrayList<Move> moveList;
 		Iterator<Piece> itPiece;
@@ -83,6 +84,54 @@ public class AI {
 		} //Piece loop
 		
 		return bestMove; //Return or just make it?
+*/
+		Move m = this.randomMove(b,g);
+		
+		g.click(m.getSrcR(), m.getSrcC());
+		g.click(m.getDestR(), m.getDestC());
+	
+	}
+	
+	public Move randomMove(Board b,Game g)
+	{
+		ArrayList<Move> moveList = new ArrayList<Move>();
+		ArrayList<Piece> pieceList;
+		Iterator<Piece> itPiece;
+		Piece p;
+		Move m;
+		int numMoves,moveNum;
+		
+		pieceList = b.getPieceList(computerColor);
+		
+		itPiece = pieceList.listIterator();
+	
+		while (itPiece.hasNext())
+		{
+			p = itPiece.next();
+			moveList.addAll(p.genMoves(b));
+		}
+		
+		numMoves = moveList.size();
+		
+		while(true)
+		{
+			int srcR,srcC,destR,destC;
+			
+			moveNum = (int)(Math.random() * numMoves);
+			
+			m = moveList.get(moveNum);
+			
+			
+			if (g.validateSrc(m,b))
+			{
+				if(g.validateDest(m,b))
+					break;
+			}
+			
+		}
+
+		
+		return m;
 	}
 	
 	public Score getBoardScore(Board b,Board B,Move m)
