@@ -366,13 +366,23 @@ public class Frame extends JFrame
 			
 			this.resetMove();
 			this.toggleTurn();
+			AI ai = new AI(AI.Strategy.Bastille,1);
+			ai.makeMove(b);
 		}
 		else
 		{
 			this.clearHighlight(srcR,srcC);
 			this.resetMove();
 		}
+		
 	}
+	
+	public void showDialog(String message, String title)
+	{
+		Container c = getContentPane();
+		JOptionPane.showMessageDialog(c, message, title, 1);
+	}
+	
 
 	private boolean validateSrc()
 	{
@@ -487,7 +497,7 @@ public class Frame extends JFrame
 			return false;
 	}
 	
-	private void addMessage(String s)
+	public void addMessage(String s)
 	{
 		verboseBox.append(s + newline);
 		
@@ -495,17 +505,17 @@ public class Frame extends JFrame
 		verboseBox.setCaretPosition(verboseBox.getDocument().getLength());
 	}
 	
-	private void setHighlight(int srcR, int srcC)
+	public void setHighlight(int srcR, int srcC)
 	{
 			tilebutton[srcR][srcC].setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.blue));
 	}
 	
-	private void clearHighlight(int srcR, int srcC)
+	public void clearHighlight(int srcR, int srcC)
 	{
 			tilebutton[srcR][srcC].setBorder(null);	
 	}
 	
-	private void clearAllHighlights()
+	public void clearAllHighlights()
 	{
 		for (int i=0;i<8;i++)
 		{
@@ -523,7 +533,7 @@ public class Frame extends JFrame
 		destPiece = null;
 	}
 	
-	private void toggleTurn()
+	public void toggleTurn()
 	{
 		if(whitePlayer.isSelected())
 		{
@@ -537,7 +547,7 @@ public class Frame extends JFrame
 		}
 	}
 	
-	private void updateIcons(int srcR, int srcC, int destR, int destC)
+	public void updateIcons(int srcR, int srcC, int destR, int destC)
 	{	
 
 			//Set desintation icon to source icon
@@ -547,7 +557,7 @@ public class Frame extends JFrame
 			tilebutton[srcR][srcC].setIcon(null);
 	}
 	
-	private void disableButtons()
+	public void disableButtons()
 	{
 		for (int i=0;i<8;i++)
 		{
@@ -558,7 +568,7 @@ public class Frame extends JFrame
 		}
 	}
 	
-	private void enableButtons()
+	public void enableButtons()
 	{
 		for (int i=0;i<8;i++)
 		{
