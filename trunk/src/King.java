@@ -21,6 +21,8 @@ final public class King extends Piece
 	{
 		Piece p;
 		King k;
+		Move m;
+		
 		int testR = srcR;
 		int testC = srcC;
 		
@@ -90,8 +92,11 @@ final public class King extends Piece
 			//Copy board
 			Board B = new Board(b);
 			
-			//Make move
-			B.makeMove(srcR, srcC, testR, testC);
+			//Create new move
+			m = new Move(srcR,srcC,testR,testC);
+			
+			//Make move on copy board
+			B.makeMove(m);
 			
 			//Get King 
 			k = B.getKing(color);
@@ -141,6 +146,7 @@ final public class King extends Piece
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		Piece p;
 		King k;
+		Move m;
 		int direction =0;
 		
 		while(direction <8)
@@ -201,8 +207,11 @@ final public class King extends Piece
 				//Copy board
 				Board B = new Board(b);
 				
-				//Make move
-				B.makeMove(srcR, srcC, testR, testC);
+				//Create new move
+				m = new Move(srcR,srcC,testR,testC);
+				
+				//Make move on copy board
+				B.makeMove(m);
 				
 				//Get King 
 				k = B.getKing(color);
@@ -226,14 +235,12 @@ final public class King extends Piece
 					//If Piece Not My Color
 					if (p.getColor() != color)
 					{
-						Move m = new Move(srcR,srcC,testR,testC);
 						moveList.add(m);
 						break;
 					}
 				}
 				else //Square empty
 				{
-					Move m = new Move(srcR,srcC,testR,testC);
 					moveList.add(m);
 				}
 				

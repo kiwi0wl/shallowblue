@@ -153,12 +153,12 @@ public class Game {
 		
 		if (this.isCheckmate(b,m))
 		{
+			//Do these to show the finishing move
+			board.makeMove(m);
 
 			//Disable all buttons
 			frame.disableButtons();
 			
-			//Do these to show the finishing move
-			board.makeMove(m);
 			frame.updateIcons(m);
 			frame.clearAllHighlights();
 
@@ -174,12 +174,12 @@ public class Game {
 		
 		if(this.isStalemate(b,m))
 		{
-				
+			//Do these to show the finishing move
+			board.makeMove(m);
+		
 			//Disable all buttons
 			frame.disableButtons();
 			
-			//Do these to show the finishing move
-			board.makeMove(m);
 			frame.updateIcons(m);
 			frame.clearAllHighlights();
 			
@@ -194,7 +194,7 @@ public class Game {
 		return true;
 	}
 	
-	private boolean inCheck(Board b)
+	public boolean inCheck(Board b)
 	{
 		King king;
 		
@@ -206,7 +206,7 @@ public class Game {
  			return false;
 	}
 	
-	private boolean inCheck(Board b, Move m)
+	public boolean inCheck(Board b, Move m)
 	{
 		King king;
 		Board B;
@@ -274,5 +274,7 @@ public class Game {
 		else
 			turn = Piece.Color.white;
 	}
+	
+	
 	
 }

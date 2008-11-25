@@ -111,7 +111,7 @@ public class AI {
 			moveList.addAll(p.genMoves(b));
 		}
 		
-		numMoves = moveList.size();
+		numMoves = moveList.size(); //Draw -  = 0
 		
 		while(true)
 		{
@@ -164,7 +164,7 @@ public class AI {
 		destR = m.getDestR();
 		destC = m.getDestC();
 				
-		if(!(b.isEmpty(destR, destC)))
+		if(b.getPiece(destR, destC) != null)
 		{
 			p1 = b.getPiece(srcR, srcC);
 			p2 = b.getPiece(destR, destC);

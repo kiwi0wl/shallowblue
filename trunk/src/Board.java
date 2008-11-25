@@ -86,14 +86,6 @@ public class Board
 		}
 	}
 	
-	public boolean isEmpty(int r, int c)
-	{
-		if (chessBoard[r][c] == null)
-			return true;
-		else
-			return false;
-	}
-	
 	//Return piece by position
 	public Piece getPiece(int r, int c)
 	{
@@ -126,8 +118,13 @@ public class Board
 	}
 	
 	//Move pieces on the board array
-	public void makeMove(int srcR, int srcC, int destR, int destC)
+	public void makeMove(Move m)
 	{
+		int srcR,srcC,destR,destC;
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		destR = m.getDestR();
+		destC = m.getDestC();
 		
 		//Move piece on board array
 		chessBoard[destR][destC] = chessBoard[srcR][srcC];
@@ -138,18 +135,6 @@ public class Board
 		
 		//Set board source to empty
 		chessBoard[srcR][srcC] = null;
-	}
-	
-	//Move pieces on the board array
-	public void makeMove(Move m)
-	{
-		int srcR,srcC,destR,destC;
-		srcR = m.getSrcR();
-		srcC = m.getSrcC();
-		destR = m.getDestR();
-		destC = m.getDestC();
-		
-		this.makeMove(srcR, srcC, destR, destC);
 	}
 	
 	//Return list of all pieces, or by color
