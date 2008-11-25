@@ -10,7 +10,6 @@ final public class King extends Piece
 		super(color,srcR,srcC);
 		
 		this.name = Name.king;
-		this.side = Piece.Side.invalid;
 	}
 	
 	public King(Piece p)

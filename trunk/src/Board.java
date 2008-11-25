@@ -12,24 +12,24 @@ public class Board
 		chessBoard = new Piece[8][8];
 		
 		//Black
-		chessBoard[0][0] = new Rook(Piece.Color.black,0,0,Piece.Side.queenside);
-		chessBoard[0][1] = new Knight(Piece.Color.black,0,1,Piece.Side.queenside);
-		chessBoard[0][2] = new Bishop(Piece.Color.black,0,2,Piece.Side.queenside);
+		chessBoard[0][0] = new Rook(Piece.Color.black,0,0);
+		chessBoard[0][1] = new Knight(Piece.Color.black,0,1);
+		chessBoard[0][2] = new Bishop(Piece.Color.black,0,2);
 		chessBoard[0][3] = new Queen(Piece.Color.black,0,3);
 		chessBoard[0][4] = new King(Piece.Color.black,0,4);
-		chessBoard[0][5] = new Bishop(Piece.Color.black,0,5,Piece.Side.kingside);
-		chessBoard[0][6] = new Knight(Piece.Color.black,0,6,Piece.Side.kingside);
-		chessBoard[0][7] = new Rook(Piece.Color.black,0,7,Piece.Side.kingside);
+		chessBoard[0][5] = new Bishop(Piece.Color.black,0,5);
+		chessBoard[0][6] = new Knight(Piece.Color.black,0,6);
+		chessBoard[0][7] = new Rook(Piece.Color.black,0,7);
 		
 		//White
-		chessBoard[7][0] = new Rook(Piece.Color.white,7,0,Piece.Side.queenside);
-		chessBoard[7][1] = new Knight(Piece.Color.white,7,1,Piece.Side.queenside);
-		chessBoard[7][2] = new Bishop(Piece.Color.white,7,2,Piece.Side.queenside);
+		chessBoard[7][0] = new Rook(Piece.Color.white,7,0);
+		chessBoard[7][1] = new Knight(Piece.Color.white,7,1);
+		chessBoard[7][2] = new Bishop(Piece.Color.white,7,2);
 		chessBoard[7][3] = new Queen(Piece.Color.white,7,3);
 		chessBoard[7][4] = new King(Piece.Color.white,7,4);
-		chessBoard[7][5] = new Bishop(Piece.Color.white,7,5,Piece.Side.kingside);
-		chessBoard[7][6] = new Knight(Piece.Color.white,7,6,Piece.Side.kingside);
-		chessBoard[7][7] = new Rook(Piece.Color.white,7,7,Piece.Side.kingside);
+		chessBoard[7][5] = new Bishop(Piece.Color.white,7,5);
+		chessBoard[7][6] = new Knight(Piece.Color.white,7,6);
+		chessBoard[7][7] = new Rook(Piece.Color.white,7,7);
 
 		//Set pawns up and blank spaces
 		for (int i = 0; i < 8; i++)

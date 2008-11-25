@@ -6,11 +6,9 @@ public abstract class Piece
 	protected int srcR,srcC;
 	protected Name name;
 	protected Color color;
-	protected Side side;
 	
 	public enum Name{pawn,knight,bishop,rook,queen,king,invalid};
 	public enum Color{black,white,invalid};
-	public enum Side{queenside,kingside,invalid};
 	
 //Constructor	
 	public Piece(Piece.Color color, int srcR, int srcC)
@@ -47,12 +45,7 @@ public abstract class Piece
 	{
 		return color;
 	}
-	
-	public Piece.Side getSide()
-	{
-		return side;
-	}
-	
+		
 
 	public Piece.Name getName()
 	{
