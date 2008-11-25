@@ -2,18 +2,16 @@ import java.util.ArrayList;
 
 final public class Rook extends Piece
 {
-	public Rook(Piece.Color color, int srcR,int srcC,Piece.Side side)
+	public Rook(Piece.Color color, int srcR,int srcC)
 	{
 		super(color,srcR,srcC);
 		
 		name = Name.rook;
-		this.side = side;
-
 	}
 	
 	public Rook(Piece p)
 	{
-		this(p.getColor(),p.getSrcR(),p.getSrcC(),p.getSide());
+		this(p.getColor(),p.getSrcR(),p.getSrcC());
 	}
 	
 	

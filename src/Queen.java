@@ -7,7 +7,6 @@ final public class Queen extends Piece
 		super(color,srcR,srcC);
 		
 		this.name = Name.queen;
-		this.side = Piece.Side.invalid;
 	}
 	
 	public Queen(Piece p)

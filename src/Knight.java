@@ -2,17 +2,16 @@ import java.util.ArrayList;
 
 final public class Knight extends Piece 
 {
-	public Knight(Piece.Color color, int srcR,int srcC,Piece.Side side)
+	public Knight(Piece.Color color, int srcR,int srcC)
 	{
 		super(color,srcR,srcC);
 		
 		name = Name.knight;
-		this.side = side;
 	}
 	
 	public Knight(Piece p)
 	{
-		this(p.getColor(),p.getSrcR(),p.getSrcC(),p.getSide());
+		this(p.getColor(),p.getSrcR(),p.getSrcC());
 	}
 	
 	public boolean legalMove(int destR,int destC, Board b)
