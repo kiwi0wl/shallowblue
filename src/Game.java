@@ -6,21 +6,20 @@ public class Game {
 	private Piece.Color turn;
 	private Frame frame;
 	private Move move;
-	private boolean inCheck;
 	
 	public Game(Frame f)
 	{
 		board = new Board();
 		turn = Piece.Color.white;
-		this.f = f;
-		m = new Move();
+		this.frame = f;
+		this.move = null;
 	}
 	
 	public void click(int r, int c)
 	{
 		int srcR,srcC,destR,destC;
 		
-		if(move.isSrcSet())
+		if( move == null)
 		{
 			move = new Move();
 			move.setSrcR(r);
@@ -53,6 +52,7 @@ public class Game {
 				frame.updateIcons(srcR,srcC,destR,destC);
 				frame.clearHighlight(srcR,srcC);
 				this.toggleTurn();
+				frame.toggleTurn();
 				move = null;
 			}
 			else
@@ -161,7 +161,7 @@ public class Game {
 		return true;
 	}
 	
-	public boolean inCheck(Board b)
+	private boolean inCheck(Board b)
 	{
 		King king;
 		
@@ -173,7 +173,7 @@ public class Game {
  			return false;
 	}
 	
-	public boolean inCheck(Board b, Move m)
+	private boolean inCheck(Board b, Move m)
 	{
 		King king;
 		Board B;
@@ -190,7 +190,7 @@ public class Game {
  			return false;
 	}
 	
-	public boolean isCheckmate(Board b,Move m )
+	private boolean isCheckmate(Board b,Move m )
 	{
 		King enemyKing;
 		Piece.Color enemyColor;
@@ -215,7 +215,7 @@ public class Game {
 		return false;
 	}
 	
-	public boolean isStalemate(Board b,Move m)
+	private boolean isStalemate(Board b,Move m)
 	{
 		ArrayList<Piece> list1;
 		ArrayList<Piece> list2;
@@ -240,8 +240,6 @@ public class Game {
 			turn = Piece.Color.black;
 		else
 			turn = Piece.Color.white;
-		
-		f.toggleTurn();
 	}
 	
 }
