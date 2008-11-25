@@ -6,67 +6,84 @@ public class Game {
 	private Piece.Color turn;
 	private Frame frame;
 	private Move move;
+	private AI ai;
 	
-	public Game(Frame f)
+	public Game(Frame f,int players)
 	{
 		board = new Board();
 		turn = Piece.Color.white;
 		this.frame = f;
 		this.move = null;
+		
+		if(players == 1)
+			this.ai = new AI(AI.Strategy.Necrophobic,1);
+		else
+			this.ai = null;
 	}
 	
-	public void click(int r, int c)
-	{
-		int srcR,srcC,destR,destC;
-		
+	public boolean click(int r, int c)
+	{		
 		if( move == null)
 		{
 			move = new Move();
 			move.setSrcR(r);
 			move.setSrcC(c);
-			srcR = r;
-			srcC = c;
 			
-			if(validateSrc(srcR,srcC))
+			if(validateSrc(move,board))
 			{
-				frame.setHighlight(srcR, srcC);
+				frame.setHighlight(move);
+				return true;
 			}
 			else
 			{
-				frame.clearHighlight(srcR,srcC);
+				frame.clearHighlight(move);
 				move = null;
+				return false;
 			}
 		}
 		else
 		{
 			move.setDestR(r);
 			move.setDestC(c);
-			destR = r;
-			destC = c;
-			srcR = move.getSrcR();
-			srcC = move.getSrcC();
+
 			
-			if(validateDest(destR,destC))
+			if(validateDest(move,board))
 			{
 				board.makeMove(move);
-				frame.updateIcons(srcR,srcC,destR,destC);
-				frame.clearHighlight(srcR,srcC);
+				frame.updateIcons(move);
+				frame.clearHighlight(move);
 				this.toggleTurn();
 				frame.toggleTurn();
 				move = null;
+				return true;
 			}
 			else
 			{
-				frame.clearHighlight(srcR,srcC);
+				frame.clearHighlight(move);
 				move =null;
+				return false;
 			}
 		}
+		
 	}
-	private boolean validateSrc(int srcR,int srcC)
+	
+	public void AIMove()
+	{
+		if(ai != null)
+		{
+			ai.makeMove(this,board);
+		}
+	}
+	
+	public boolean validateSrc(Move m,Board b)
 	{
 		Piece p;
+		int srcR,srcC;
 		
-		if ( (p = board.getPiece(srcR, srcC)) == null)
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		
+		if ( (p = b.getPiece(srcR, srcC)) == null)
 		{
 			frame.addMessage("No one home! Try clicking an occupied piece!");
 			return false;
@@ -81,16 +98,18 @@ public class Game {
 		return true;
 	}
 	
-	private boolean validateDest(int destR,int destC)
+	public boolean validateDest(Move m,Board b)
 	{
 		Piece p;
-		int srcR,srcC;
+		int srcR,srcC,destR,destC;
 		
-		srcR = move.getSrcR();
-		srcC = move.getSrcC();
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		destR = m.getDestR();
+		destC = m.getDestC();
 		
 		//Is dest occupied?
-		if ( (p = board.getPiece(destR, destC)) != null)
+		if ( (p = b.getPiece(destR, destC)) != null)
 		{
 			//Is trying to capture own piece?
 			if ( p.getColor() == turn )
@@ -101,19 +120,19 @@ public class Game {
 		}
 		
 		//Get src Piece
-		p = board.getPiece(srcR,srcC);
+		p = b.getPiece(srcR,srcC);
 		
 		//Is legal move?
-		if( !(p.legalMove(destR,destC, board)))
+		if( !(p.legalMove(destR,destC, b)))
 		{
 			frame.addMessage("This is chess! Try a legal move!");
 			return false;
 		}
 		
 		//If in check, does this move take me out of check?
-		if(this.inCheck(board))
+		if(this.inCheck(b))
 		{
-			if(this.inCheck(board, move))
+			if(this.inCheck(b, m))
 			{
 				frame.addMessage("Still in Check! This move doesn't save the KING!");
 				return false;
@@ -123,7 +142,7 @@ public class Game {
 		//If not in check, Does this move put ME in check?
 		else
 		{
-			if(this.inCheck(board, move))
+			if(this.inCheck(b, m))
 			{
 				frame.addMessage("Don't put your King in Danger! This move will put YOU in check!");
 				return false;
@@ -132,30 +151,44 @@ public class Game {
 		
 		
 		
-		if (this.isCheckmate(board,move))
+		if (this.isCheckmate(b,m))
 		{
-			//Show dialog box
-			frame.showDialog(turn.name().toUpperCase() + " WINS!", "WINNER!");	
-			
+
 			//Disable all buttons
 			frame.disableButtons();
+			
+			//Do these to show the finishing move
+			board.makeMove(m);
+			frame.updateIcons(m);
+			frame.clearAllHighlights();
+
+			
+			//Show dialog box
+			frame.showDialog("        " + turn.name().toUpperCase() + " WINS!", "WINNER!");	
+			
 				
 			//Add Message
 			frame.addMessage(turn.name().toUpperCase() + " WINS!");
-			return true;
+			return false;
 		}
 		
-		if(this.isStalemate(board,move))
+		if(this.isStalemate(b,m))
 		{
-			//Show dialog box
-			frame.showDialog("Draw", "Draw");	
 				
 			//Disable all buttons
 			frame.disableButtons();
+			
+			//Do these to show the finishing move
+			board.makeMove(m);
+			frame.updateIcons(m);
+			frame.clearAllHighlights();
+			
+			//Show dialog box 
+			frame.showDialog("            "  + "Draw", "Draw");	
 				
 			//Add Message
 			frame.addMessage("The game is a draw!");
-			return true;
+			return false;
 		}
 		
 		return true;
