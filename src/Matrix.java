@@ -11,44 +11,44 @@ public class Matrix {
 		protect = new int[6][6];
 		
 		//Pawn = 0
-		protect[0][0] = 0;
-		protect[0][1] = 0;
-		protect[0][2] = 0;
-		protect[0][3] = 0;
-		protect[0][4] = 0;
-		protect[0][5] = 0;
+		protect[0][0] = 2;
+		protect[0][1] = 2;
+		protect[0][2] = 2;
+		protect[0][3] = 2;
+		protect[0][4] = 2;
+		protect[0][5] = 2;
 		
 		//Knight =1
-		protect[1][0] = 0;
-		protect[1][1] = 0;
-		protect[1][2] = 0;
-		protect[1][3] = 0;
-		protect[1][4] = 0;
-		protect[1][5] = 0;
+		protect[1][0] = 1;
+		protect[1][1] = 1;
+		protect[1][2] = 1;
+		protect[1][3] = 1;
+		protect[1][4] = 1;
+		protect[1][5] = 1;
 		
 		//Bishop =2
-		protect[2][0] = 0;
-		protect[2][1] = 0;
-		protect[2][2] = 0;
-		protect[2][3] = 0;
-		protect[2][4] = 0;
-		protect[2][5] = 0;
+		protect[2][0] = 1;
+		protect[2][1] = 1;
+		protect[2][2] = 1;
+		protect[2][3] = 1;
+		protect[2][4] = 1;
+		protect[2][5] = 1;
 		
 		//Rook =3
-		protect[3][0] = 0;
-		protect[3][1] = 0;
-		protect[3][2] = 0;
-		protect[3][3] = 0;
-		protect[3][4] = 0;
-		protect[3][5] = 0;
+		protect[3][0] = 1;
+		protect[3][1] = 1;
+		protect[3][2] = 1;
+		protect[3][3] = 1;
+		protect[3][4] = 1;
+		protect[3][5] = 1;
 		
 		//Queen =4
-		protect[4][0] = 0;
-		protect[4][1] = 0;
-		protect[4][2] = 0;
-		protect[4][3] = 0;
-		protect[4][4] = 0;
-		protect[4][5] = 0;
+		protect[4][0] = 1;
+		protect[4][1] = 1;
+		protect[4][2] = 1;
+		protect[4][3] = 1;
+		protect[4][4] = 1;
+		protect[4][5] = 1;
 		
 		//King =5
 		protect[5][0] = 0;
@@ -60,52 +60,53 @@ public class Matrix {
 		
 		kill = new int[6][6];
 		
+		//Pawn
 		kill[0][0] = 0;
-		kill[0][1] = 0;
-		kill[0][2] = 0;
-		kill[0][3] = 0;
-		kill[0][4] = 0;
-		kill[0][5] = 0;
+		kill[0][1] = 10;
+		kill[0][2] = 15;
+		kill[0][3] = 20;
+		kill[0][4] = 25;
+		kill[0][5] = 1000;
 	
 		//Knight =1
-		kill[1][0] = 0;
+		kill[1][0] = 1;
 		kill[1][1] = 0;
-		kill[1][2] = 0;
-		kill[1][3] = 0;
-		kill[1][4] = 0;
-		kill[1][5] = 0;
+		kill[1][2] = 10;
+		kill[1][3] = 15;
+		kill[1][4] = 20;
+		kill[1][5] = 1000;
 	
 		//Bishop =2
-		kill[2][0] = 0;
-		kill[2][1] = 0;
+		kill[2][0] = 1;
+		kill[2][1] = 5;
 		kill[2][2] = 0;
-		kill[2][3] = 0;
-		kill[2][4] = 0;
-		kill[2][5] = 0;
+		kill[2][3] = 15;
+		kill[2][4] = 20;
+		kill[2][5] = 1000;
 	
 		//Rook =3
-		kill[3][0] = 0;
-		kill[3][1] = 0;
-		kill[3][2] = 0;
+		kill[3][0] = 1;
+		kill[3][1] = 5;
+		kill[3][2] = 10;
 		kill[3][3] = 0;
-		kill[3][4] = 0;
-		kill[3][5] = 0;
+		kill[3][4] = 20;
+		kill[3][5] = 1000;
 		
 		//Queen =4
-		kill[4][0] = 0;
-		kill[4][1] = 0;
-		kill[4][2] = 0;
-		kill[4][3] = 0;
-		kill[4][4] = 0;
-		kill[4][5] = 0;
+		kill[4][0] = 1;
+		kill[4][1] = 5;
+		kill[4][2] = 10;
+		kill[4][3] = 15;
+		kill[4][4] = 15;
+		kill[4][5] = 1000;
 		
 		//King =5
-		kill[5][0] = 0;
-		kill[5][1] = 0;
-		kill[5][2] = 0;
-		kill[5][3] = 0;
-		kill[5][4] = 0;
-		kill[5][5] = 0;
+		kill[5][0] = 1;
+		kill[5][1] = 5;
+		kill[5][2] = 10;
+		kill[5][3] = 15;
+		kill[5][4] = 20;
+		kill[5][5] = 1000;
 		
 		die = new int[6][6];
 		

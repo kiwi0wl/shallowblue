@@ -64,11 +64,10 @@ public class AI {
 					//Make a copy of base Board
 					testBoard = new Board(baseBoard);
 					
-					//Make move on the copy board
 					testBoard.makeMove(m);
 					
 					//Get the score of board with move
-					s = this.getBoardScore(testBoard);
+					s = this.getBoardScore(b,testBoard,m);
 					
 					//Find the best score of this move or best move
 					if(s.isBetter(bestMove.getScore(), strategy))
@@ -86,30 +85,56 @@ public class AI {
 		return bestMove; //Return or just make it?
 	}
 	
-	public Score getBoardScore(Board b)
+	public Score getBoardScore(Board b,Board B,Move m)
 	{
 		Score s;
 		int protectScore=0,killScore=0,possibleKillScore=0,dieScore=0,positionScore=0,escapeScore=0;
-		
-		/*
-		protectScore = this.getProtectScore(b);
-		killScore = this.getKillScore(b);
-		possibleKillScore = this.possibleKillScore();
-		dieScore = this.getDieScore(b);
-		positionScore = this.getPositionScore(b);
-		escapeScore = this.getEscapeScore(b);
-		*/
+			
+		protectScore = this.getProtectScore(B);
+		killScore = this.getKillScore(b,m);
+/*		possibleKillScore = this.possibleKillScore();
+		dieScore = this.getDieScore();
+		positionScore = this.getPositionScore();
+		escapeScore = this.getEscapeScore();
+*/
 		
 		s = new Score(protectScore,killScore,possibleKillScore,dieScore,positionScore,escapeScore);
 		
 		return s;
 	}
 	
+	public int getKillScore(Board b, Move m)
+	{
+		int srcR,srcC,destR,destC;
+		Piece p1,p2;
+		Piece.Name n1,n2;
+		int killValue;
+		
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		destR = m.getDestR();
+		destC = m.getDestC();
+				
+		if(!(b.isEmpty(destR, destC)))
+		{
+			p1 = b.getPiece(srcR, srcC);
+			p2 = b.getPiece(destR, destC);
+			n1 = p1.getName();
+			n2 = p2.getName();
+	
+			killValue = matrix.getKillValue(n1,n2 );
+			
+			return killValue;
+		}
+		
+		return 0;
+	}
+	
 	public int getProtectScore(Board b)
 	{
 		//Get protect score each color and subtract computer - enemy
 		
-		ArrayList<Piece> pieceList;
+		ArrayList<Piece> pieceList1,pieceList2;
 		Iterator<Piece> itPiece1,itPiece2;
 		Piece p1,p2;
 		int protectScore=0,whiteScore=0,blackScore=0;
@@ -127,12 +152,13 @@ public class AI {
 			//Zero out temp score
 			protectScore =0;
 		
-			//Get pieces based on currentColor
-			pieceList = b.getPieceList(currentColor);
-		
-			//Setup two iterators through the common list
-			itPiece1 = pieceList.listIterator();
-			itPiece2 = pieceList.listIterator();
+			//Get 2 piece list based on currentColor
+			pieceList1 = b.getPieceList(currentColor);
+			pieceList2 = b.getPieceList(currentColor);
+			
+			//Setup two iterators through list
+			itPiece1 = pieceList1.listIterator();
+			itPiece2 = pieceList2.listIterator();
 		
 			//Go through each piece to every other piece of the same color
 			while (itPiece1.hasNext())
