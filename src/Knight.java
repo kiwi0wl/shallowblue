@@ -16,15 +16,7 @@ final public class Knight extends Piece
 	
 	public boolean legalMove(int destR,int destC, Board b)
 	{
-		/*Move m;
-		
-		m = new Move(srcR,srcC,destR,destC);
-		
-		if (this.legalMove(m, b))
-			return true;
-		else
-			return false;
-		*/
+		Piece p;
 		
 		int testR = srcR;
 		int testC = srcC;
@@ -88,7 +80,7 @@ final public class Knight extends Piece
 			}
 			
 			//If Square has Something In it, return false
-			if ( !(b.isEmpty(testR, testC)))
+			if ( b.getPiece(testR, testC) != null)
 			{
 				return false;
 			}
