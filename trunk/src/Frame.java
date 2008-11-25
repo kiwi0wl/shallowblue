@@ -48,12 +48,7 @@ public class Frame extends JFrame
 	private int colorFlag;
 	
 	//Board Object
-	private Board b;
-	
-	private Piece srcPiece;
-	private Piece destPiece;
-	
-	private Piece.Color turn;
+	private Game game;
 	
 	public Frame()
 	{
@@ -228,17 +223,11 @@ public class Frame extends JFrame
 		tileIcon[10] = new ImageIcon("src/pic/black/queen.png");
 		tileIcon[11] = new ImageIcon("src/pic/black/rook.png");
 				
-		//SetIcons
+		//Set icons 
 		this.setInitIcon();
 		
-		this.srcPiece = null;
-		this.destPiece = null;
-		
-		turn = Piece.Color.white;
-		
-		//Set the Game Up
-		b = new Board();
-		
+		//New game
+		game = new Game(this);
 	}
 	
 //Listeners
@@ -254,10 +243,8 @@ public class Frame extends JFrame
 			r = Integer.parseInt(s.substring(0, 1));
 			c = Integer.parseInt(s.substring(1));
 			
-			if(srcPiece ==null)
-				srcSelected(r,c);
-			else
-				destSelected(r,c);	
+			game.click(r, c);
+			
 		}	
 	}
 	
@@ -267,19 +254,17 @@ public class Frame extends JFrame
 		public void actionPerformed(ActionEvent e)
 		{
 			clearAllHighlights();
-			b = new Board();
+			
+			WTF();
  
 			setInitIcon();
 			
 			enableButtons();
-			
-			srcPiece = null;
-			destPiece = null;
-			
-			turn = Piece.Color.white;
+
 			whitePlayer.setSelected(true);
 
 			verboseBox.setText("");
+			
 			addMessage("[VERBOSE]");
 		}
 	}
@@ -307,202 +292,18 @@ public class Frame extends JFrame
 	
 	
 //Methods
-	
-	private void srcSelected(int srcR, int srcC)
-	{
-		srcPiece = b.getPiece(srcR, srcC);
-		
-		if(validateSrc())
-		{
-			this.setHighlight(srcR, srcC);
-		}
-		else
-		{
-			this.clearHighlight(srcR,srcC);
-			this.resetMove();
-		}
-	}
-	
-	private void destSelected(int destR, int destC)
-	{
-		destPiece = b.getPiece(destR, destC);
-		
-		int srcR = srcPiece.getSrcR();
-		int srcC = srcPiece.getSrcC();
-		
-		if(validateDest(destR,destC))
-		{
-			b.makeMove(srcR, srcC, destR, destC);
-			this.updateIcons(srcR,srcC,destR,destC);
-			this.clearHighlight(srcR,srcC);
-			
-			if (this.isCheckmate())
-			{
-				//Show dialog box
-				Container c = getContentPane();
-				JOptionPane.showMessageDialog(c, turn.name().toUpperCase() + " WINS!", "WINNER!", 1);
-					
-				//Disable all buttons
-				this.disableButtons();
-					
-				//Add Message
-				this.addMessage(turn.name().toUpperCase() + " WINS!");
-				return;
-			}
-			
-			if(this.isStalemate())
-			{
-				//Show dialog box
-				Container c = getContentPane();
-				JOptionPane.showMessageDialog(c, "Draw", "Draw", 1);
-					
-				//Disable all buttons
-				this.disableButtons();
-					
-				//Add Message
-				this.addMessage("The game is a draw!");
-				return;
-			}
-			
-			this.resetMove();
-			this.toggleTurn();
-			AI ai = new AI(AI.Strategy.Bastille,1);
-			ai.makeMove(b);
-		}
-		else
-		{
-			this.clearHighlight(srcR,srcC);
-			this.resetMove();
-		}
-		
-	}
-	
-	public void showDialog(String message, String title)
-	{
-		Container c = getContentPane();
-		JOptionPane.showMessageDialog(c, message, title, 1);
-	}
-	
-
-	private boolean validateSrc()
-	{
-		if ( srcPiece == null)
-		{
-			this.addMessage("No one home! Try clicking an occupied piece!");
-			return false;
-		}
-		
-		if (srcPiece.getColor() != turn)
-		{
-			this.addMessage("Bad color! Try clicking your own color!");
-			return false;
-		}
-		
-		return true;
-	}
-	
-	private boolean validateDest(int destR, int destC)
-	{
-		Board testBoard;
-		King realKing;
-		King testKing;
-		boolean checkStatusReal,checkStatusTest;
-	
-		//Is trying to capture own piece?
-		if ( (destPiece != null) && (destPiece.getColor() == turn) )
-		{
-			this.addMessage("No cannibalizm! Try capturing your enemy's pieces!");
-			return false;
-		}
-
-		//Is legal move?
-		if( !(srcPiece.legalMove(destR,destC, b)))
-		{
-			this.addMessage("This is chess! Try a legal move!");
-			return false;
-		}
-		
-		//Create a test board 
- 		testBoard = new Board(b);
- 		
- 		//Make move on this board
- 		testBoard.makeMove(srcPiece.getSrcR(), srcPiece.getSrcC(), destR, destC);
- 		
- 		//Get the kings
- 		testKing = (King) testBoard.getKing(turn);
- 		realKing = (King) b.getKing(turn);
- 		
- 		//Get check status
- 		checkStatusReal = realKing.inCheck(b);
- 		checkStatusTest = testKing.inCheck(testBoard);
- 		
- 		
-		//If in check, does this move take me out of check?
-		if(checkStatusReal)
-		{
-			if(checkStatusTest)
-			{
-				this.addMessage("Still in Check! This move doesn't save the KING!");
-				return false;
-			}	
-		}
-		
-		//If not in check, Does this move put ME in check?
-		if( !(checkStatusReal))
-		{
-			if(checkStatusTest)
-			{
-				this.addMessage("Don't put your King in Danger! This move will put YOU in check!");
-				return false;
-			}	
-		}	
-		
-		return true;
-		
-	}
-	
-	//Is the enemy is in check mate
-	public boolean isCheckmate()
-	{
-		King myKing;
-		King enemyKing;
-		Piece.Color enemyColor;
-		
-		if(turn == Piece.Color.white)
-			enemyColor = Piece.Color.black;
-		else
-			enemyColor = Piece.Color.white;
-		
-		enemyKing = (King) b.getKing(enemyColor);
-		
-		if(enemyKing.inCheckMate(b))
-		{
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public boolean isStalemate()
-	{
-		ArrayList<Piece> list1;
-		ArrayList<Piece> list2;
-		
-		list1 = b.getPieceList(Piece.Color.black);
-		list2 = b.getPieceList(Piece.Color.white);
-		
-		if(list1.size() == 1 && list2.size() == 1)
-			return true;
-		else
-			return false;
-	}
-	
 	public void addMessage(String s)
 	{
 		verboseBox.append(s + newline);
 		
 		//Move ScrollBox with Added Text
 		verboseBox.setCaretPosition(verboseBox.getDocument().getLength());
+	}
+	
+	public void showDialog(String message, String title)
+	{
+		Container c = getContentPane();
+		JOptionPane.showMessageDialog(c, message, title, 1);
 	}
 	
 	public void setHighlight(int srcR, int srcC)
@@ -526,24 +327,15 @@ public class Frame extends JFrame
 		}
 	}
 	
-	
-	private void resetMove()
-	{
-		srcPiece = null;
-		destPiece = null;
-	}
-	
 	public void toggleTurn()
 	{
 		if(whitePlayer.isSelected())
 		{
 			blackPlayer.setSelected(true);
-			turn = Piece.Color.black;
 		}
 		else
 		{
 			whitePlayer.setSelected(true);
-			turn = Piece.Color.white;
 		}
 	}
 	
@@ -635,6 +427,11 @@ public class Frame extends JFrame
 			tilebutton[5][i].setIcon(null);
 		}
 		
+	}
+	
+	public void  WTF()
+	{
+		game = new Game(this);
 	}
 	
 } 
