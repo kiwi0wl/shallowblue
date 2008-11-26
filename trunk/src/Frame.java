@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -49,9 +48,7 @@ public class Frame extends JFrame
 	
 	//Board Object
 	private Game game;
-	
-	private int numPlayers;
-	
+		
 	public Frame()
 	{
 		//Set the FrameUp,

@@ -162,4 +162,129 @@ public class Board
 		
 		return pieceList;
 	}
+	
+	//In check on board from this color
+	public boolean inCheck(Piece.Color t)
+	{
+		King king;
+		
+		king = (King) this.getKing(t);
+		
+ 		if ( king.inCheck(this) == true)
+ 			return true;
+ 		else
+ 			return false;
+	}
+	
+	//In check on board after move from this color
+	public boolean inCheck(Move m, Piece.Color t)
+	{
+		King king;
+		Board B;
+		
+ 		B = new Board(this);
+ 				
+		B.makeMove(m);
+		
+		king = (King) B.getKing(t);
+		
+ 		if ( king.inCheck(B) == true)
+ 			return true;
+ 		else
+ 			return false;
+	}
+	
+	//Is checkmate after this move 
+	public boolean isCheckmate(Move m)
+	{
+		King whiteKing,blackKing;
+		Board B;
+		
+		B = new Board(this);
+		
+		B.makeMove(m);
+		
+		blackKing = (King) B.getKing(Piece.Color.black);
+		whiteKing = (King) B.getKing(Piece.Color.white);
+		
+		if(whiteKing.inCheckMate(B) || blackKing.inCheckMate(B))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	//Is stalemate after this move for this color
+	public boolean isStalemate(Move m)
+	{
+		ArrayList<Move> whiteMoveList,blackMoveList;
+		ArrayList<Piece> whitePieceList,blackPieceList;
+		Iterator<Piece> itPiece;
+		Board B;
+		Piece p;
+
+		//Initialize
+		whiteMoveList = new ArrayList<Move>();
+		blackMoveList = new ArrayList<Move>();
+
+		//Copy board
+		B = new Board(this);
+		
+		//Make move on copy board
+		B.makeMove(m);
+	
+		
+		//Get piece lists
+		whitePieceList = B.getPieceList(Piece.Color.white);
+		blackPieceList = B.getPieceList(Piece.Color.black);
+		
+		//Get all moves for white
+		itPiece = whitePieceList.listIterator();
+		while (itPiece.hasNext())
+		{
+			 p = itPiece.next();
+			 
+			 	 whiteMoveList.addAll( p.genMoves(B));
+		}
+		
+		//Get all moves for black
+		itPiece = blackPieceList.listIterator();
+		while (itPiece.hasNext())
+		{
+			 p = itPiece.next();
+			 
+			 	 blackMoveList.addAll( p.genMoves(B));
+		}
+		
+		//Check if only kings left
+		if(whitePieceList.size() == 1 && blackPieceList.size() == 1)
+		{
+			return true;
+		}
+		
+		//Check White
+		//Not in Check
+		if( !(this.inCheck(Piece.Color.white)))
+		{
+			//No moves
+			if(whiteMoveList.size() == 0)
+			{
+				return true;
+			}
+		}
+	
+		//Check Black
+		//Not in Check
+		if( !(this.inCheck(Piece.Color.black)))
+		{
+			//No moves
+			if(blackMoveList.size() == 0)
+			{
+				return true;
+			}
+		}
+	
+		return false;
+	}
 }
