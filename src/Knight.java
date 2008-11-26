@@ -16,8 +16,6 @@ final public class Knight extends Piece
 	
 	public boolean legalMove(int destR,int destC, Board b)
 	{
-		Piece p;
-		
 		int testR = srcR;
 		int testC = srcC;
 		

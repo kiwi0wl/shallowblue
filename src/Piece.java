@@ -78,13 +78,6 @@ public abstract class Piece
 		return false;
 	}
 
-	public Piece.Color getEnemyColor()
-	{
-		//Get color of attacker
-		if(color == Piece.Color.white)
-			return Piece.Color.black;
-		else
-			return Piece.Color.white;
-	}
+
 	
 }

@@ -263,8 +263,11 @@ final public class King extends Piece
 		Iterator<Piece> itPiece; 
 		Piece.Color enemyColor;
 		
-		//Find enemy color
-		enemyColor = this.getEnemyColor();
+		if(color == Piece.Color.white)
+			enemyColor = Piece.Color.black;
+		else
+			enemyColor = Piece.Color.white;
+
 		
 		//Get enemy piece list
 		pieceList = b.getPieceList(enemyColor);

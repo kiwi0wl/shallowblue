@@ -122,11 +122,8 @@ public class AI {
 			m = moveList.get(moveNum);
 			
 			
-			if (g.validateSrc(m,b))
-			{
-				if(g.validateDest(m,b))
-					break;
-			}
+			if(g.validMove(m, b))
+				break;
 			
 		}
 

@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class Game {
 	
 	private Board board;
@@ -75,7 +73,15 @@ public class Game {
 		}
 	}
 	
-	public boolean validateSrc(Move m,Board b)
+	public boolean validMove(Move m, Board b)
+	{
+		if(validateSrc(m,b) && validateDest(m,b))
+			return true;
+		else 
+			return false;
+	}
+	
+	private boolean validateSrc(Move m,Board b)
 	{
 		Piece p;
 		int srcR,srcC;
@@ -98,7 +104,7 @@ public class Game {
 		return true;
 	}
 	
-	public boolean validateDest(Move m,Board b)
+	private boolean validateDest(Move m,Board b)
 	{
 		Piece p;
 		int srcR,srcC,destR,destC;
@@ -130,9 +136,9 @@ public class Game {
 		}
 		
 		//If in check, does this move take me out of check?
-		if(this.inCheck(b))
+		if(b.inCheck(turn))
 		{
-			if(this.inCheck(b, m))
+			if(b.inCheck(m,turn))
 			{
 				frame.addMessage("Still in Check! This move doesn't save the KING!");
 				return false;
@@ -142,16 +148,15 @@ public class Game {
 		//If not in check, Does this move put ME in check?
 		else
 		{
-			if(this.inCheck(b, m))
+			if(b.inCheck(m,turn))
 			{
 				frame.addMessage("Don't put your King in Danger! This move will put YOU in check!");
 				return false;
 			}
 		}
 		
-		
-		
-		if (this.isCheckmate(b,m))
+	
+		if (b.isCheckmate(m))
 		{
 			//Do these to show the finishing move
 			board.makeMove(m);
@@ -172,7 +177,7 @@ public class Game {
 			return false;
 		}
 		
-		if(this.isStalemate(b,m))
+		if(b.isStalemate(m))
 		{
 			//Do these to show the finishing move
 			board.makeMove(m);
@@ -194,79 +199,6 @@ public class Game {
 		return true;
 	}
 	
-	public boolean inCheck(Board b)
-	{
-		King king;
-		
-		king = (King) b.getKing(turn);
-		
- 		if ( king.inCheck(b) == true)
- 			return true;
- 		else
- 			return false;
-	}
-	
-	public boolean inCheck(Board b, Move m)
-	{
-		King king;
-		Board B;
-		
- 		B = new Board(b);
- 				
-		B.makeMove(m);
-		
-		king = (King) B.getKing(turn);
-		
- 		if ( king.inCheck(B) == true)
- 			return true;
- 		else
- 			return false;
-	}
-	
-	private boolean isCheckmate(Board b,Move m )
-	{
-		King enemyKing;
-		Piece.Color enemyColor;
-		Board B;
-		
-		B = new Board(b);
-		
-		B.makeMove(m);
-		
-		if(turn == Piece.Color.white)
-			enemyColor = Piece.Color.black;
-		else
-			enemyColor = Piece.Color.white;
-		
-		enemyKing = (King) B.getKing(enemyColor);
-		
-		if(enemyKing.inCheckMate(B))
-		{
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private boolean isStalemate(Board b,Move m)
-	{
-		ArrayList<Piece> list1;
-		ArrayList<Piece> list2;
-		Board B;
-		
-		B = new Board(b);
-		
-		B.makeMove(m);
-		
-		list1 = B.getPieceList(Piece.Color.black);
-		list2 = B.getPieceList(Piece.Color.white);
-		
-		if(list1.size() == 1 && list2.size() == 1)
-			return true;
-		else
-			return false;
-	}
-	
 	private void toggleTurn()
 	{
 		if(turn == Piece.Color.white)
@@ -274,7 +206,4 @@ public class Game {
 		else
 			turn = Piece.Color.white;
 	}
-	
-	
-	
 }
