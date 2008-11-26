@@ -11,6 +11,13 @@ public class Frame extends JFrame
 	private static final int HEIGHT=720;
 	private static final String newline = "\n";
 	
+	//Game 
+	Board board;
+	Piece.Color turn;
+	AI ai;
+	Move move;
+	int numPlayers;
+	
 	//Menu 
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
@@ -45,9 +52,6 @@ public class Frame extends JFrame
 	
 	//Use to Decide Tile Color
 	private int colorFlag;
-	
-	//Board Object
-	private Game game;
 		
 	public Frame()
 	{
@@ -69,10 +73,10 @@ public class Frame extends JFrame
 		fileMenu = new JMenu("File");
 		
 			//Add the New Game Item and Listener
-			p1MenuItem  = new JMenuItem("1 Player");
+			p1MenuItem  = new JCheckBoxMenuItem("1 Player");
 			p1MenuItem.addActionListener(new NewOnePlayerGameButtonListener());
 			
-			p2MenuItem  = new JMenuItem("2 Player");
+			p2MenuItem  = new JCheckBoxMenuItem("2 Player");
 			p2MenuItem.addActionListener(new NewTwoPlayerGameButtonListener());
 			
 			//Add the Verbose Option and Listener
@@ -86,7 +90,7 @@ public class Frame extends JFrame
 			//Add all Menu Items to Menu
 			fileMenu.add(p1MenuItem);
 			fileMenu.add(p2MenuItem);
-			fileMenu.add(verboseMenuItem);
+			//fileMenu.add(verboseMenuItem);
 			fileMenu.add(exitMenuItem);
 			 
 			//Add Menu To Menu Bar
@@ -229,7 +233,19 @@ public class Frame extends JFrame
 		//Set icons 
 		this.setInitIcon();
 		
-		this.disableButtons();
+		//Disable buttons
+		this.buttonAccessible(false);
+		
+		//White goes first
+		turn = Piece.Color.white;
+		
+		//Hold move
+		move = null;
+		
+		//Initialize
+		ai = null;
+		numPlayers=0;
+		board = null;
 	}
 	
 //Listeners
@@ -245,12 +261,13 @@ public class Frame extends JFrame
 			r = Integer.parseInt(s.substring(0, 1));
 			c = Integer.parseInt(s.substring(1));
 			
+			if(numPlayers == 2)
+				humanMove(r, c);
+			else if (numPlayers == 1 && turn == Piece.Color.white)
+				humanMove(r,c);
 			
-			game.click(r, c);
-			
-			if(blackPlayer.isSelected())
-				game.AIMove();
-			
+			if(numPlayers == 1 && turn == Piece.Color.black)
+				aiMove(r,c);			
 		}	
 	}
 	
@@ -260,6 +277,7 @@ public class Frame extends JFrame
 		public void actionPerformed(ActionEvent e)
 		{
 			createGame(1); //Get Rid Method
+
 		}
 	}
 	
@@ -293,22 +311,114 @@ public class Frame extends JFrame
 		}
 	}
 	
+	public void humanMove(int r, int c)
+	{		
+		//Source click
+		if( move == null)
+		{
+			move = new Move();
+			move.setSrcR(r);
+			move.setSrcC(c);
+			
+			//If validate source click
+			if(board.isValidSrc(move, turn))
+			{
+				this.setHighlight(move);
+			}
+			else
+			{
+				this.clearHighlight(move);
+				move = null;
+			}
+		}
+		else //Destination click
+		{
+			move.setDestR(r);
+			move.setDestC(c);
+
+			//If validate destination click
+			if(board.isValidDest(move, turn))
+			{
+				board.makeMove(move);	
+				this.updateIcons(move);
+				this.clearHighlight(move);
+				move = null;
+				
+				//If checkmate
+				if(board.isCheckmate())
+				{
+					this.buttonAccessible(false);
+					this.showDialog("        " + turn.name().toUpperCase() + " WINS!", "WINNER!");
+					return;
+				}
+		
+				//If a draw
+				if(board.isStalemate())
+				{
+					this.buttonAccessible(false);
+					this.showDialog("            "  + "Draw", "Draw");
+					return;
+				}
+				
+				this.toggleTurn();
+			}
+			else 
+			{
+				this.clearHighlight(move);
+				move =null;
+			}
+		
+		}
+		
+	}
 	
-//Methods
-	public void addMessage(String s)
+	private  void aiMove(int r, int c)
 	{
+		Move m;
+		
+		m = ai.makeMove(board);
+		
+		board.makeMove(m);
+		
+		this.updateIcons(m);
+		
+		//If checkmate
+		if(board.isCheckmate())
+		{
+			this.buttonAccessible(false);
+			this.showDialog("        " + turn.name().toUpperCase() + " WINS!", "WINNER!");
+			return;
+		}
+
+		//If a draw
+		if(board.isStalemate())
+		{
+			this.buttonAccessible(false);
+			this.showDialog("            "  + "Draw", "Draw");
+			return;
+		}
+		
+		this.toggleTurn();
+	}
+	
+	//Add message to text box
+	public void addMessage(String s)
+	{		
+		//add line
 		verboseBox.append(s + newline);
 		
 		//Move ScrollBox with Added Text
 		verboseBox.setCaretPosition(verboseBox.getDocument().getLength());
 	}
 	
+	//Show dialog message box
 	public void showDialog(String message, String title)
 	{
 		Container c = getContentPane();
 		JOptionPane.showMessageDialog(c, message, title, 1);
 	}
 	
+	//Remove source highlight
 	public void setHighlight(Move m)
 	{
 		int srcR,srcC;
@@ -319,6 +429,7 @@ public class Frame extends JFrame
 		tilebutton[srcR][srcC].setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.blue));
 	}
 	
+	//Set source highlight
 	public void clearHighlight(Move m)
 	{
 		int srcR,srcC;
@@ -329,6 +440,7 @@ public class Frame extends JFrame
 		tilebutton[srcR][srcC].setBorder(null);	
 	}
 	
+	//Remove all highlights
 	public void clearAllHighlights()
 	{
 		for (int i=0;i<8;i++)
@@ -340,14 +452,22 @@ public class Frame extends JFrame
 		}
 	}
 	
+	//Change turn
 	public void toggleTurn()
 	{
 		if(whitePlayer.isSelected())
+		{
 			blackPlayer.setSelected(true);
+			turn = Piece.Color.black;
+		}
 		else
+		{
 			whitePlayer.setSelected(true);
+			turn = Piece.Color.white; 
+		}
 	}
 	
+	//Change icons to reflect the move
 	public void updateIcons(Move m)
 	{	
 		int srcR,srcC,destR,destC;
@@ -357,40 +477,29 @@ public class Frame extends JFrame
 		destR = m.getDestR();
 		destC = m.getDestC();
 		
-			//Set desintation icon to source icon
-			tilebutton[destR][destC].setIcon(tilebutton[srcR][srcC].getIcon());
+		//Set destination icon to source icon
+		tilebutton[destR][destC].setIcon(tilebutton[srcR][srcC].getIcon());
 		
-			//Set source icon to nothing
-			tilebutton[srcR][srcC].setIcon(null);
+		//Set source icon to nothing
+		tilebutton[srcR][srcC].setIcon(null);
 	}
 	
-	public void disableButtons()
+	//Enable/Disable buttons
+	public void buttonAccessible(boolean x)
 	{
 		for (int i=0;i<8;i++)
 		{
 			for(int j=0;j<8;j++)
 			{
-				tilebutton[i][j].setEnabled(false);
+				tilebutton[i][j].setEnabled(x);
 			}
 		}
 	}
-	
-	public void enableButtons()
-	{
-		for (int i=0;i<8;i++)
-		{
-			for(int j=0;j<8;j++)
-			{
-				tilebutton[i][j].setEnabled(true);
-			}
-		}
-	}
-
-	
+		
 	//Set icons to starting positions
 	private void setInitIcon()
 	{
-
+		//Create the icons
 		tileIcon[0] = new ImageIcon("src/pic/white/bishop.png");
 		tileIcon[1] = new ImageIcon("src/pic/white/king.png");
 		tileIcon[2] = new ImageIcon("src/pic/white/knight.png");
@@ -405,33 +514,33 @@ public class Frame extends JFrame
 		tileIcon[10] = new ImageIcon("src/pic/black/queen.png");
 		tileIcon[11] = new ImageIcon("src/pic/black/rook.png");
 		
-		//Rook
+		//Set Rook
 		tilebutton[0][0].setIcon(tileIcon[11]);
 		tilebutton[0][7].setIcon(tileIcon[11]);
 		tilebutton[7][0].setIcon(tileIcon[5]);
 		tilebutton[7][7].setIcon(tileIcon[5]);
 		
-		//Knight
+		//Set Knight
 		tilebutton[0][1].setIcon(tileIcon[8]);
 		tilebutton[0][6].setIcon(tileIcon[8]);
 		tilebutton[7][1].setIcon(tileIcon[2]);
 		tilebutton[7][6].setIcon(tileIcon[2]);
 		
-		//Bishop
+		//Set Bishop
 		tilebutton[0][2].setIcon(tileIcon[6]);
 		tilebutton[0][5].setIcon(tileIcon[6]);
 		tilebutton[7][2].setIcon(tileIcon[0]);
 		tilebutton[7][5].setIcon(tileIcon[0]);
 		
-		//Queen
+		//Set Queen
 		tilebutton[0][3].setIcon(tileIcon[10]);
 		tilebutton[7][3].setIcon(tileIcon[4]);
 		
-		//King
+		//Set King
 		tilebutton[0][4].setIcon(tileIcon[7]);
 		tilebutton[7][4].setIcon(tileIcon[1]);
 	
-		//Pawn & blanks.
+		//Set Pawn & blanks.
 		for(int i=0;i<8;i++)
 		{
 			tilebutton[6][i].setIcon(tileIcon[3]);
@@ -444,26 +553,43 @@ public class Frame extends JFrame
 		
 	}
 	
+	//Set a new game up for 1/2 players
 	public void  createGame(int numPlayers)
 	{
-		clearAllHighlights();
-
-		game = new Game(this,numPlayers);
+		this.clearAllHighlights();
 		
-		setInitIcon();
+		this.setInitIcon();
 		
-		enableButtons();
+		this.buttonAccessible(true);
 
-		whitePlayer.setSelected(true);
+		this.whitePlayer.setSelected(true);
 
-		verboseBox.setText("");
+		this.verboseBox.setText("");
 		
-		addMessage("[VERBOSE]");
+		this.addMessage("[VERBOSE]");
 		
 		if(numPlayers == 1)
-			addMessage("1 Player Game");
+		{
+			p1MenuItem.setSelected(true);
+			p2MenuItem.setSelected(false);
+			ai = new AI(AI.Strategy.Bastille,1);
+			this.numPlayers=1;
+		}
 		else
-			addMessage("2 Player Game");
+		{
+			p2MenuItem.setSelected(true);
+			p1MenuItem.setSelected(false);
+			this.numPlayers=2;
+
+		}
+		
+		//Reset to white
+		turn = Piece.Color.white;
+		
+		//Clear move
+		move = null;
+		
+		board = new Board();
 	}
 	
 } 

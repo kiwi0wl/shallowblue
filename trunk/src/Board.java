@@ -4,7 +4,6 @@ import java.util.Iterator;
 public class Board
 {
 	private Piece chessBoard[][];
-
 	
 	public Board()
 	{	
@@ -41,6 +40,7 @@ public class Board
 			chessBoard[4][i] = null;
 			chessBoard[5][i] = null;
 		}
+		
 	}
 	
 	//Copy Constructor
@@ -56,20 +56,20 @@ public class Board
 		{
 			for(int j=0;j<8;j++)
 			{
-				//Clear square because of constructor setup
+				//Clear tile
 				chessBoard[i][j] = null;
 				
-				//Get piece at position
+				//Get piece
 				p = b.getPiece(i,j);
 				
-				//If nothing there, try next tile
+				//If empty
 				if( p == null)
 					continue;
 				
 				//Get name of piece
 				name = p.getName();
 
-				//Create a copy of piece and put in copy chessBoard
+				//Create a copy of piece and put in new board
 				if(name == Piece.Name.king)
 					chessBoard[i][j] = new King(p);
 				else if (name == Piece.Name.bishop)
@@ -95,20 +95,113 @@ public class Board
 			return chessBoard[r][c];
 	}
 	
-	//Return piece by name and color and side
-	public King getKing(Piece.Color color)
+	//Is valid source move
+	public boolean isValidSrc(Move m,Piece.Color color)
+	{
+		Piece p;
+		int srcR,srcC;
+		
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		
+		//Get source piece
+		p = this.getPiece(srcR, srcC);
+		
+		//If empty
+		if ( p == null )
+		{
+			return false;
+		}
+		
+		//If wrong color
+		if (p.getColor() != color)
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	//Is valid destination move
+	public boolean isValidDest(Move m,Piece.Color color)
+	{
+		Piece p;
+		Board B;
+		int srcR,srcC,destR,destC;
+		
+		srcR = m.getSrcR();
+		srcC = m.getSrcC();
+		destR = m.getDestR();
+		destC = m.getDestC();
+		
+		//Get destination piece
+		p = this.getPiece(destR, destC);
+		
+		//If destination occupied
+		if ( p != null )
+		{
+			//If its my piece
+			if ( p.getColor() == color )
+			{
+				return false;
+			}
+		}
+		
+		//Get source piece
+		p = this.getPiece(srcR,srcC);
+		
+		//If illegal move
+		if( !(p.legalMove(destR,destC, this)))
+		{
+			return false;
+		}
+		
+		//Copy board
+		B = new Board(this);
+		
+		//Make move
+		B.makeMove(m);
+		
+		//If in check on this board
+		if(this.inCheck(color))
+		{
+			
+			//If still in check after the move
+			if(B.inCheck(color))
+			{
+				return false;
+			}
+
+		}
+		else //If not in check on this board
+		{
+			//If in check after move
+			if(B.inCheck(color))
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	//Return the king according to color
+	private King getKing(Piece.Color color)
 	{
 		ArrayList<Piece> pieceList;
 		Iterator<Piece> itPiece;
 		Piece p;
 		
+		//Get the piece list according to color
 		pieceList = getPieceList(color);
 		
+		//Find the king
 		itPiece = pieceList.listIterator();
 		while (itPiece.hasNext())
 		{
 			 p = itPiece.next();
-			if(p.getName() == Piece.Name.king && p.getColor() == color)
+			 
+			if(p.getName() == Piece.Name.king)
 			{
 				return (King)p;
 			}
@@ -117,7 +210,7 @@ public class Board
 		return null;
 	}
 	
-	//Move pieces on the board array
+	//Move piece
 	public void makeMove(Move m)
 	{
 		int srcR,srcC,destR,destC;
@@ -126,7 +219,7 @@ public class Board
 		destR = m.getDestR();
 		destC = m.getDestC();
 		
-		//Move piece on board array
+		//Change references
 		chessBoard[destR][destC] = chessBoard[srcR][srcC];
 		
 		//Update piece position
@@ -137,7 +230,7 @@ public class Board
 		chessBoard[srcR][srcC] = null;
 	}
 	
-	//Return list of all pieces, or by color
+	//Return list of all pieces by color or all
 	public ArrayList<Piece> getPieceList(Piece.Color color)
 	{
 		ArrayList<Piece> pieceList = new ArrayList<Piece>();
@@ -163,7 +256,7 @@ public class Board
 		return pieceList;
 	}
 	
-	//In check on board from this color
+	//If this color in check
 	public boolean inCheck(Piece.Color t)
 	{
 		King king;
@@ -175,69 +268,38 @@ public class Board
  		else
  			return false;
 	}
-	
-	//In check on board after move from this color
-	public boolean inCheck(Move m, Piece.Color t)
-	{
-		King king;
-		Board B;
-		
- 		B = new Board(this);
- 				
-		B.makeMove(m);
-		
-		king = (King) B.getKing(t);
-		
- 		if ( king.inCheck(B) == true)
- 			return true;
- 		else
- 			return false;
-	}
-	
-	//Is checkmate after this move 
-	public boolean isCheckmate(Move m)
+
+	//If in checkmate
+	public boolean isCheckmate()
 	{
 		King whiteKing,blackKing;
-		Board B;
 		
-		B = new Board(this);
+		//Get both kings
+		blackKing = (King) this.getKing(Piece.Color.black);
+		whiteKing = (King) this.getKing(Piece.Color.white);
 		
-		B.makeMove(m);
-		
-		blackKing = (King) B.getKing(Piece.Color.black);
-		whiteKing = (King) B.getKing(Piece.Color.white);
-		
-		if(whiteKing.inCheckMate(B) || blackKing.inCheckMate(B))
-		{
+		//If either king in checkmate
+		if(whiteKing.inCheckMate(this) || blackKing.inCheckMate(this))
 			return true;
-		}
-		
-		return false;
+		else
+			return false;
 	}
-	
-	//Is stalemate after this move for this color
-	public boolean isStalemate(Move m)
+		
+	//If in stalemate
+	public boolean isStalemate()
 	{
 		ArrayList<Move> whiteMoveList,blackMoveList;
 		ArrayList<Piece> whitePieceList,blackPieceList;
 		Iterator<Piece> itPiece;
-		Board B;
 		Piece p;
 
 		//Initialize
 		whiteMoveList = new ArrayList<Move>();
 		blackMoveList = new ArrayList<Move>();
-
-		//Copy board
-		B = new Board(this);
-		
-		//Make move on copy board
-		B.makeMove(m);
-	
 		
 		//Get piece lists
-		whitePieceList = B.getPieceList(Piece.Color.white);
-		blackPieceList = B.getPieceList(Piece.Color.black);
+		whitePieceList = this.getPieceList(Piece.Color.white);
+		blackPieceList = this.getPieceList(Piece.Color.black);
 		
 		//Get all moves for white
 		itPiece = whitePieceList.listIterator();
@@ -245,7 +307,7 @@ public class Board
 		{
 			 p = itPiece.next();
 			 
-			 	 whiteMoveList.addAll( p.genMoves(B));
+			 	 whiteMoveList.addAll( p.genMoves(this));
 		}
 		
 		//Get all moves for black
@@ -254,20 +316,20 @@ public class Board
 		{
 			 p = itPiece.next();
 			 
-			 	 blackMoveList.addAll( p.genMoves(B));
+			 	 blackMoveList.addAll( p.genMoves(this));
 		}
 		
-		//Check if only kings left
+		//If only kings left
 		if(whitePieceList.size() == 1 && blackPieceList.size() == 1)
 		{
 			return true;
 		}
 		
 		//Check White
-		//Not in Check
+		//If not in Check
 		if( !(this.inCheck(Piece.Color.white)))
 		{
-			//No moves
+			//If no moves
 			if(whiteMoveList.size() == 0)
 			{
 				return true;
@@ -275,10 +337,10 @@ public class Board
 		}
 	
 		//Check Black
-		//Not in Check
+		//If not in Check
 		if( !(this.inCheck(Piece.Color.black)))
 		{
-			//No moves
+			//If no moves
 			if(blackMoveList.size() == 0)
 			{
 				return true;
@@ -287,4 +349,4 @@ public class Board
 	
 		return false;
 	}
-}
+}	
