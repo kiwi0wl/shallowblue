@@ -98,11 +98,8 @@ final public class King extends Piece
 			//Make move on copy board
 			B.makeMove(m);
 			
-			//Get King 
-			k = B.getKing(color);
-			
 			//In check?
-			if(k.inCheck(B))
+			if(B.inCheck(color))
 			{
 				break;
 			}
@@ -213,11 +210,8 @@ final public class King extends Piece
 				//Make move on copy board
 				B.makeMove(m);
 				
-				//Get King 
-				k = B.getKing(color);
-				
 				//In check?
-				if(k.inCheck(B))
+				if(B.inCheck(color))
 				{
 					break;
 				}
@@ -332,11 +326,8 @@ final public class King extends Piece
 						//Make the move
 						B.makeMove(m);
 						
-						//Get the King
-						king = B.getKing(color);
-						
 						//If king still in check, try another block
-						if(king.inCheck(B))
+						if(B.inCheck(color))
 							continue;
 						else //Out of check = no check mate
 							return false;

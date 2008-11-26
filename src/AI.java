@@ -22,7 +22,7 @@ public class AI {
 	}
 	
 	
-	public void makeMove(Game g,Board b)
+	public Move makeMove(Board b)
 	{
 /*
 		ArrayList<Piece> pieceList;
@@ -65,7 +65,12 @@ public class AI {
 					//Make a copy of base Board
 					testBoard = new Board(baseBoard);
 					
+					//Make move on test board
 					testBoard.makeMove(m);
+					
+					//Not valid move continue
+					if( !(g.validMove(m, testBoard)))
+						continue;
 					
 					//Get the score of board with move
 					s = this.getBoardScore(b,testBoard,m);
@@ -83,16 +88,15 @@ public class AI {
 				}//Move loop	 
 		} //Piece loop
 		
-		return bestMove; //Return or just make it?
+		return bestMove; 
 */
-		Move m = this.randomMove(b,g);
+		Move m = this.randomMove(b);
 		
-		g.click(m.getSrcR(), m.getSrcC());
-		g.click(m.getDestR(), m.getDestC());
+		return m;
 	
 	}
 	
-	public Move randomMove(Board b,Game g)
+	public Move randomMove(Board b)
 	{
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		ArrayList<Piece> pieceList;
@@ -111,23 +115,18 @@ public class AI {
 			moveList.addAll(p.genMoves(b));
 		}
 		
-		numMoves = moveList.size(); //Draw -  = 0
+		numMoves = moveList.size(); 
 		
 		while(true)
-		{
-			int srcR,srcC,destR,destC;
-			
+		{			
 			moveNum = (int)(Math.random() * numMoves);
 			
 			m = moveList.get(moveNum);
 			
-			
-			if(g.validMove(m, b))
-				break;
-			
+			if(b.isValidSrc(m, computerColor) && b.isValidDest(m, computerColor))
+				break;	
 		}
 
-		
 		return m;
 	}
 	

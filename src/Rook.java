@@ -89,6 +89,7 @@ final public class Rook extends Piece
 
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		Piece p;
+		Move m;
 		
 		int direction =0;
 		
@@ -138,14 +139,14 @@ final public class Rook extends Piece
 					//If Piece Not My Color
 					if (p.getColor() != color)
 					{
-						Move m = new Move(srcR,srcC,testR,testC);
+						m = new Move(srcR,srcC,testR,testC);
 						moveList.add(m);				
 						break;
 					}
 				}
 				else //Square empty
 				{
-					Move m = new Move(srcR,srcC,testR,testC);
+					m = new Move(srcR,srcC,testR,testC);
 					moveList.add(m);			
 				}
 		
