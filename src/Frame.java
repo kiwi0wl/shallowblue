@@ -9,7 +9,6 @@ public class Frame extends JFrame
 	private static final long serialVersionUID = 1L;
 	private static final int WIDTH=725;
 	private static final int HEIGHT=720;
-	private static final String newline = "\n";
 	
 	//Game 
 	Board board;
@@ -22,22 +21,12 @@ public class Frame extends JFrame
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem p1MenuItem,p2MenuItem,exitMenuItem;
-	private JCheckBoxMenuItem verboseMenuItem;
 	
 	//Hold Player Info/Check Info
 	private JPanel topPanel;
 	
 	//Hold Tiles
 	private JPanel tilePanel;
-	
-	//Hold log info.
-	private JPanel verbosePanel;
-	
-	//Verbose TestBox
-	private JTextArea verboseBox; 
-	
-	//Scroll Box
-	private JScrollPane verboseScroll;
 	  
 	//Tile Buttons
 	private JButton [][]tilebutton;
@@ -78,10 +67,6 @@ public class Frame extends JFrame
 			
 			p2MenuItem  = new JCheckBoxMenuItem("2 Player");
 			p2MenuItem.addActionListener(new NewTwoPlayerGameButtonListener());
-			
-			//Add the Verbose Option and Listener
-			verboseMenuItem = new JCheckBoxMenuItem("Verbose", false);
-			verboseMenuItem.addActionListener(new VerboseButtonListener());
 			   
 			//Add the Exit Item And Listener
 			exitMenuItem = new JMenuItem("Exit");
@@ -90,7 +75,6 @@ public class Frame extends JFrame
 			//Add all Menu Items to Menu
 			fileMenu.add(p1MenuItem);
 			fileMenu.add(p2MenuItem);
-			//fileMenu.add(verboseMenuItem);
 			fileMenu.add(exitMenuItem);
 			 
 			//Add Menu To Menu Bar
@@ -123,30 +107,7 @@ public class Frame extends JFrame
 			topPanel.add(whitePlayer);
 			topPanel.add(blackPlayer);
 		
-		//Create the Verbose Panel for Logs
-		verbosePanel = new JPanel();
-		verbosePanel.setLayout(new FlowLayout());
 		
-			//Create the verbose box
-			verboseBox = new JTextArea("[VERBOSE]"+newline,5,63);
-		
-			//Add Black border
-			verboseBox.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.black));
-		
-			//Don't let user enter text
-			verboseBox.setEditable(false);
-			
-			//Create scroll area from the text area
-			verboseScroll = new JScrollPane(verboseBox);
-		
-			//Never Show the Horizontal scroll bar
-			verboseScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
-			//Add scroll box to verbose panel
-			verbosePanel.add(verboseScroll);
-		
-			//Hide scroll box at startup
-			verbosePanel.setVisible(false);
 		
 	
 		//Panel For Chess Title w/Grid Layout
@@ -209,9 +170,6 @@ public class Frame extends JFrame
 		
 		//Add ChessBoard to Center Panel
 		this.add(tilePanel,BorderLayout.CENTER);
-		
-		//Add Verbose Panel to South
-		this.add(verbosePanel,BorderLayout.SOUTH);
 		
 		//FillIconArray
 		tileIcon = new ImageIcon[12];
@@ -299,17 +257,6 @@ public class Frame extends JFrame
 		}
 	}
 	
-	//Show the text box
-	private class VerboseButtonListener implements ActionListener
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			if (verboseMenuItem.isSelected())
-				verbosePanel.setVisible(true);
-			else
-				verbosePanel.setVisible(false);
-		}
-	}
 	
 	public void humanMove(int r, int c)
 	{		
@@ -399,16 +346,6 @@ public class Frame extends JFrame
 		}
 		
 		this.toggleTurn();
-	}
-	
-	//Add message to text box
-	public void addMessage(String s)
-	{		
-		//add line
-		verboseBox.append(s + newline);
-		
-		//Move ScrollBox with Added Text
-		verboseBox.setCaretPosition(verboseBox.getDocument().getLength());
 	}
 	
 	//Show dialog message box
@@ -563,10 +500,6 @@ public class Frame extends JFrame
 		this.buttonAccessible(true);
 
 		this.whitePlayer.setSelected(true);
-
-		this.verboseBox.setText("");
-		
-		this.addMessage("[VERBOSE]");
 		
 		if(numPlayers == 1)
 		{
