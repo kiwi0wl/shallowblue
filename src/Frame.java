@@ -376,7 +376,7 @@ public class Frame extends JFrame
 	{
 		Move m;
 		
-		m = ai.getMove(board);
+		m = ai.makeMove(board);
 		
 		board.makeMove(m);
 		
@@ -572,7 +572,7 @@ public class Frame extends JFrame
 		{
 			p1MenuItem.setSelected(true);
 			p2MenuItem.setSelected(false);
-			ai = new AI(1);
+			ai = new AI(AI.Strategy.Bastille,1);
 			this.numPlayers=1;
 		}
 		else
