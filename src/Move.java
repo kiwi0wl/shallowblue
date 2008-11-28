@@ -4,8 +4,7 @@ public class Move {
 	private int destC;
 	private int srcR;
 	private int srcC;
-	private Score score;
-
+	
 //Constructors
 	public Move()
 	{
@@ -13,7 +12,6 @@ public class Move {
 		srcC = -1;
 		destR = -1;
 		destC = -1;
-		this.score = null;
 	}
 	
 	public Move(int srcR, int srcC, int destR, int destC)
@@ -22,7 +20,6 @@ public class Move {
 		this.srcC = srcC;
 		this.destR = destR;
 		this.destC = destC;
-		this.score = null;
 	}
 	
 	public Move(Move m)
@@ -51,13 +48,6 @@ public class Move {
 		return destC;
 	}
 	
-	public Score getScore()
-	{
-		if(score == null)
-			return null;
-		else
-			return score;
-	}
 	
 //Mutators
 	public void setSrcR(int srcR)
@@ -78,10 +68,6 @@ public class Move {
 	public void setDestC(int c)
 	{
 		destC = c;
-	}
-	public void setScore(Score s)
-	{
-		score =s;
 	}
 	
 	
