@@ -20,7 +20,6 @@ final public class King extends Piece
 	public  boolean legalMove(int destR, int destC, Board b)
 	{
 		Piece p;
-		King k;
 		Move m;
 		
 		int testR = srcR;
@@ -142,7 +141,6 @@ final public class King extends Piece
 	{
 		ArrayList<Move> moveList = new ArrayList<Move>();
 		Piece p;
-		King k;
 		Move m;
 		int direction =0;
 		
@@ -290,7 +288,6 @@ final public class King extends Piece
 		
 		Move m;
 		Piece p;
-		King king;
 		Board B;
 		
 		//In check
