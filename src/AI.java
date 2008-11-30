@@ -6,9 +6,9 @@ public class AI {
 	
 	private Piece.Color computerColor;
 	
-	AI(int IQ)
+	AI(Piece.Color color)
 	{
-		this.computerColor = Piece.Color.black;
+		this.computerColor = color;
 	}
 	
 	
