@@ -13,14 +13,14 @@ public class Frame extends JFrame
 	//Game 
 	Board board;
 	Piece.Color turn;
-	AI ai;
+	AI ai1,ai2;
 	Move move;
 	int numPlayers;
 	
 	//Menu 
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
-	private JMenuItem p1MenuItem,p2MenuItem,exitMenuItem;
+	private JMenuItem p0MenuItem,p1MenuItem,p2MenuItem,exitMenuItem;
 	
 	//Hold Player Info/Check Info
 	private JPanel topPanel;
@@ -41,6 +41,8 @@ public class Frame extends JFrame
 	
 	//Use to Decide Tile Color
 	private int colorFlag;
+	
+	private Thread aiThread;
 		
 	public Frame()
 	{
@@ -62,6 +64,9 @@ public class Frame extends JFrame
 		fileMenu = new JMenu("File");
 		
 			//Add the New Game Item and Listener
+			p0MenuItem  = new JCheckBoxMenuItem("0 Player");
+			p0MenuItem.addActionListener(new NewZeroPlayerGameButtonListener());
+		
 			p1MenuItem  = new JCheckBoxMenuItem("1 Player");
 			p1MenuItem.addActionListener(new NewOnePlayerGameButtonListener());
 			
@@ -73,6 +78,7 @@ public class Frame extends JFrame
 			exitMenuItem.addActionListener(new ExitGameButtonListener());
 
 			//Add all Menu Items to Menu
+			fileMenu.add(p0MenuItem);
 			fileMenu.add(p1MenuItem);
 			fileMenu.add(p2MenuItem);
 			fileMenu.add(exitMenuItem);
@@ -201,7 +207,8 @@ public class Frame extends JFrame
 		move = null;
 		
 		//Initialize
-		ai = null;
+		ai1 = null;
+		ai2 = null;
 		numPlayers=0;
 		board = null;
 	}
@@ -215,18 +222,31 @@ public class Frame extends JFrame
 		{			
 			int r,c;
 			
-			String s = e.getActionCommand();
-			r = Integer.parseInt(s.substring(0, 1));
-			c = Integer.parseInt(s.substring(1));
+			if(numPlayers > 0)
+			{
+				String s = e.getActionCommand();
+				r = Integer.parseInt(s.substring(0, 1));
+				c = Integer.parseInt(s.substring(1));
 			
-			if(numPlayers == 2)
-				humanMove(r, c);
-			else if (numPlayers == 1 && turn == Piece.Color.white)
-				humanMove(r,c);
+				if(numPlayers == 2)
+					humanMove(r, c);
+				else if (numPlayers == 1 && turn == Piece.Color.white)
+					humanMove(r,c);
 			
-			if(numPlayers == 1 && turn == Piece.Color.black)
-				aiMove(r,c);			
+				if(numPlayers == 1 && turn == Piece.Color.black)
+					aiMove(Piece.Color.black);	
+			}
 		}	
+	}
+	
+	//0Player
+	private class NewZeroPlayerGameButtonListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+
+				createGame(0);
+		}
 	}
 	
 	//1 Player
@@ -234,7 +254,7 @@ public class Frame extends JFrame
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			createGame(1); //Get Rid Method
+			createGame(1); 
 
 		}
 	}
@@ -244,7 +264,7 @@ public class Frame extends JFrame
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			createGame(2); //Get Rid Method
+			createGame(2); 
 		}
 	}
 	
@@ -319,11 +339,14 @@ public class Frame extends JFrame
 		
 	}
 	
-	private  void aiMove(int r, int c)
+	private  boolean aiMove(Piece.Color player)
 	{
 		Move m;
 		
-		m = ai.getMove(board);
+		if(player == Piece.Color.white)
+			m = ai1.getMove(board);
+		else
+			m = ai2.getMove(board);
 		
 		board.makeMove(m);
 		
@@ -334,7 +357,7 @@ public class Frame extends JFrame
 		{
 			this.buttonAccessible(false);
 			this.showDialog("        " + turn.name().toUpperCase() + " WINS!", "WINNER!");
-			return;
+			return false;
 		}
 
 		//If a draw
@@ -342,10 +365,12 @@ public class Frame extends JFrame
 		{
 			this.buttonAccessible(false);
 			this.showDialog("            "  + "Draw", "Draw");
-			return;
+			return false;
 		}
 		
 		this.toggleTurn();
+		
+		return true;
 	}
 	
 	//Show dialog message box
@@ -510,28 +535,15 @@ public class Frame extends JFrame
 	//Set a new game up for 1/2 players
 	public void  createGame(int numPlayers)
 	{
+		this.numPlayers = numPlayers;
+		
 		this.clearAllHighlights();
 		
 		this.setInitIcon();
 		
 		this.buttonAccessible(true);
 
-		this.whitePlayer.setSelected(true);
-		
-		if(numPlayers == 1)
-		{
-			p1MenuItem.setSelected(true);
-			p2MenuItem.setSelected(false);
-			ai = new AI(1);
-			this.numPlayers=1;
-		}
-		else
-		{
-			p2MenuItem.setSelected(true);
-			p1MenuItem.setSelected(false);
-			this.numPlayers=2;
-
-		}
+		this.whitePlayer.setSelected(true);		
 		
 		//Reset to white
 		turn = Piece.Color.white;
@@ -539,7 +551,83 @@ public class Frame extends JFrame
 		//Clear move
 		move = null;
 		
+		//New Board
 		board = new Board();
+
+		if(numPlayers == 1)
+		{
+			//Check the right boxes
+			p1MenuItem.setSelected(true);
+			p2MenuItem.setSelected(false);
+			ai2 = new AI(Piece.Color.black);
+			
+			//Set number players
+			this.numPlayers=1;
+		}
+		else if (numPlayers == 2)
+		{
+			//Check the right boxes
+			p2MenuItem.setSelected(true);
+			p1MenuItem.setSelected(false);
+			
+			//Set number players
+			this.numPlayers=2;
+
+		}
+		else if (numPlayers == 0)
+		{
+			//Set number players
+			this.numPlayers=0;
+			
+			//Check the right boxes
+			p1MenuItem.setSelected(false);
+			p2MenuItem.setSelected(false);
+			p0MenuItem.setSelected(true);
+
+			//Create the AI players
+			ai1 = new AI(Piece.Color.white);
+			ai2 = new AI(Piece.Color.black);
+			
+			//Disable the tile panel
+			tilePanel.setEnabled(false);
+			
+			//Create and run thread
+			aiThread = new  Thread(new AiThread());
+			aiThread.start();
+		}
 	}
+	
+	
+	//Used in 0 player game
+	class AiThread implements Runnable
+	{
+		//Each computer player moves and waits till game over
+		public void run()
+		{
+			int wait = 200;
+			while(true)
+			{
+				try
+				{
+					if( !(aiMove(Piece.Color.white)))
+						break;
+					
+					Thread.sleep(wait);
+					
+					if( !(aiMove(Piece.Color.black)))
+							break;
+					
+					Thread.sleep(wait);
+				}
+				catch (InterruptedException e)
+				{
+				}
+			}
+			
+		}	
+	}
+			
+			
+			
 	
 } 
