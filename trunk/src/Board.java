@@ -164,8 +164,7 @@ public class Board
 		
 		//If in check on this board
 		if(this.inCheck(color))
-		{
-			
+		{	
 			//If still in check after the move
 			if(B.inCheck(color))
 			{
@@ -218,13 +217,26 @@ public class Board
 		srcC = m.getSrcC();
 		destR = m.getDestR();
 		destC = m.getDestC();
-		
+
 		//Change references
 		chessBoard[destR][destC] = chessBoard[srcR][srcC];
 		
 		//Update piece position
-		chessBoard[destR][destC].setSrcC(destC);
 		chessBoard[destR][destC].setSrcR(destR);
+		chessBoard[destR][destC].setSrcC(destC);
+		
+		//If move in first/last row 
+		if(destR == 0 || destR == 7)
+		{
+			//Pawn to Queen
+			if(chessBoard[destR][destC].getName() == Piece.Name.pawn)
+			{
+				if(chessBoard[destR][destC].getColor() == Piece.Color.black)
+					chessBoard[destR][destC] = new Queen(Piece.Color.black,7,destC);
+				else
+					chessBoard[destR][destC] = new Queen(Piece.Color.white,0,destC);					
+			}
+		}
 		
 		//Set board source to empty
 		chessBoard[srcR][srcC] = null;
@@ -264,7 +276,9 @@ public class Board
 		king = (King) this.getKing(t);
 		
  		if ( king.inCheck(this) == true)
- 			return true;
+ 		{	
+ 			return true;		
+ 		}
  		else
  			return false;
 	}

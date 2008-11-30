@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 final public class Rook extends Piece
 {
+
 	public Rook(Piece.Color color, int srcR,int srcC)
 	{
 		super(color,srcR,srcC);
@@ -13,7 +14,6 @@ final public class Rook extends Piece
 	{
 		this(p.getColor(),p.getSrcR(),p.getSrcC());
 	}
-	
 	
 	public  boolean legalMove(int destR, int destC, Board b)
 	{
