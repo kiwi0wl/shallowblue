@@ -408,6 +408,7 @@ public class Frame extends JFrame
 	public void updateIcons(Move m)
 	{	
 		int srcR,srcC,destR,destC;
+		Piece p;
 		
 		srcR = m.getSrcR();
 		srcC = m.getSrcC();
@@ -416,9 +417,25 @@ public class Frame extends JFrame
 		
 		//Set destination icon to source icon
 		tilebutton[destR][destC].setIcon(tilebutton[srcR][srcC].getIcon());
+	
+		//Move in last Row
+		if(destR == 0 || destR == 7)
+		{
+			p = board.getPiece(destR, destC);
+
+			//Change Pawn to Queen Icon
+			if(p.getName() == Piece.Name.queen)
+			{
+				if(p.getColor() == Piece.Color.black)
+					tilebutton[destR][destC].setIcon(tileIcon[10]);
+				else
+					tilebutton[destR][destC].setIcon(tileIcon[4]);
+			}
+		}
 		
 		//Set source icon to nothing
 		tilebutton[srcR][srcC].setIcon(null);
+		
 	}
 	
 	//Enable/Disable buttons

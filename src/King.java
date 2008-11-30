@@ -2,8 +2,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 final public class King extends Piece
-{
-
+{	
 	
 	public King(Piece.Color color, int srcR,int srcC)
 	{
@@ -25,11 +24,18 @@ final public class King extends Piece
 		int testR = srcR;
 		int testC = srcC;
 		
-		// False If Step Is More Than Two
+		// Is move more then one
 		if (Math.abs(srcR - destR) > 1 || Math.abs(srcC - destC) > 1)
 		{
-			return false;
+		/*
+			//Is this a castling move
+			if(this.isCastleCool(destR,destC,b))
+				return true;
+			else
+		*/		return false;
 		}
+		
+		
 		
 		while(true)
 		{
