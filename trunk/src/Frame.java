@@ -215,7 +215,7 @@ public class Frame extends JFrame
 		//Thread
 		 aiThread = new AiThread();
 		 
-		 this.openButtons(false);
+		 buttonAccessible(false);
 
 	}
 	
@@ -469,12 +469,6 @@ public class Frame extends JFrame
 	//Enable/Disable buttons
 	public void buttonAccessible(boolean x)
 	{
-		//Disable the tile panel
-		tilePanel.setEnabled(x);
-	}
-	
-	public void openButtons(boolean x)
-	{
 		 //Disable all buttons for looks
 		 for(int i =0;i<8;i++)
 		 {
@@ -490,19 +484,19 @@ public class Frame extends JFrame
 	private void setInitIcon()
 	{
 		//Create the icons
-		tileIcon[0] = new ImageIcon("src/pic/white/bishop.png");
-		tileIcon[1] = new ImageIcon("src/pic/white/king.png");
-		tileIcon[2] = new ImageIcon("src/pic/white/knight.png");
-		tileIcon[3] = new ImageIcon("src/pic/white/pawn.png");
-		tileIcon[4] = new ImageIcon("src/pic/white/queen.png");
-		tileIcon[5] = new ImageIcon("src/pic/white/rook.png");
+		tileIcon[0] = new ImageIcon("pic/white/bishop.png");
+		tileIcon[1] = new ImageIcon("pic/white/king.png");
+		tileIcon[2] = new ImageIcon("pic/white/knight.png");
+		tileIcon[3] = new ImageIcon("pic/white/pawn.png");
+		tileIcon[4] = new ImageIcon("pic/white/queen.png");
+		tileIcon[5] = new ImageIcon("pic/white/rook.png");
 		
-		tileIcon[6] = new ImageIcon("src/pic/black/bishop.png");
-		tileIcon[7] = new ImageIcon("src/pic/black/king.png");
-		tileIcon[8] = new ImageIcon("src/pic/black/knight.png");
-		tileIcon[9] = new ImageIcon("src/pic/black/pawn.png");
-		tileIcon[10] = new ImageIcon("src/pic/black/queen.png");
-		tileIcon[11] = new ImageIcon("src/pic/black/rook.png");
+		tileIcon[6] = new ImageIcon("pic/black/bishop.png");
+		tileIcon[7] = new ImageIcon("pic/black/king.png");
+		tileIcon[8] = new ImageIcon("pic/black/knight.png");
+		tileIcon[9] = new ImageIcon("pic/black/pawn.png");
+		tileIcon[10] = new ImageIcon("pic/black/queen.png");
+		tileIcon[11] = new ImageIcon("pic/black/rook.png");
 		
 		//Set Rook
 		tilebutton[0][0].setIcon(tileIcon[11]);
@@ -648,7 +642,7 @@ public class Frame extends JFrame
 		move = null;
 		
 		//Enable Buttons
-		this.openButtons(true);
+		 buttonAccessible(true);
 
 	}
 	
