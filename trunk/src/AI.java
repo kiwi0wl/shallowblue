@@ -12,6 +12,7 @@ public class AI {
 	}
 	
 	
+	//Return a valid move
 	public Move getMove(Board b)
 	{
 		Move m;
@@ -22,6 +23,7 @@ public class AI {
 
 	}
 	
+	//Pick a random move for this color
 	public Move randomMove(Board b)
 	{
 		ArrayList<Move> moveList = new ArrayList<Move>();
@@ -35,6 +37,7 @@ public class AI {
 		
 		itPiece = pieceList.listIterator();
 	
+		//Add each piece moves, to movelist
 		while (itPiece.hasNext())
 		{
 			p = itPiece.next();
@@ -43,6 +46,7 @@ public class AI {
 		
 		numMoves = moveList.size(); 
 		
+		//Find a random and valid move
 		while(true)
 		{			
 			moveNum = (int)(Math.random() * numMoves);
