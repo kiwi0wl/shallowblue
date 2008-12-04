@@ -42,7 +42,7 @@ public class Frame extends JFrame
 	//Use to Decide Tile Color
 	private int colorFlag;
 	
-	private Thread aiThread;
+	private  AiThread aiThread;
 		
 	public Frame()
 	{
@@ -211,6 +211,12 @@ public class Frame extends JFrame
 		ai2 = null;
 		numPlayers=0;
 		board = null;
+		
+		//Thread
+		 aiThread = new AiThread();
+		 
+		 this.openButtons(false);
+
 	}
 	
 //Listeners
@@ -244,7 +250,6 @@ public class Frame extends JFrame
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-
 				createGame(0);
 		}
 	}
@@ -254,8 +259,7 @@ public class Frame extends JFrame
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			createGame(1); 
-
+			createGame(1);
 		}
 	}
 	
@@ -336,7 +340,6 @@ public class Frame extends JFrame
 			}
 		
 		}
-		
 	}
 	
 	private  boolean aiMove(Piece.Color player)
@@ -466,14 +469,22 @@ public class Frame extends JFrame
 	//Enable/Disable buttons
 	public void buttonAccessible(boolean x)
 	{
-		for (int i=0;i<8;i++)
-		{
-			for(int j=0;j<8;j++)
-			{
-				tilebutton[i][j].setEnabled(x);
-			}
-		}
+		//Disable the tile panel
+		tilePanel.setEnabled(x);
 	}
+	
+	public void openButtons(boolean x)
+	{
+		 //Disable all buttons for looks
+		 for(int i =0;i<8;i++)
+		 {
+			 for(int j=0;j<8;j++)
+			 {
+				 tilebutton[i][j].setEnabled(x);
+			 }
+		 }
+	}
+		
 		
 	//Set icons to starting positions
 	private void setInitIcon()
@@ -534,7 +545,92 @@ public class Frame extends JFrame
 	
 	//Set a new game up for 1/2 players
 	public void  createGame(int numPlayers)
-	{
+	{			
+		//New Board
+		board = new Board();
+			
+		if(numPlayers == 1)
+		{
+			//Stop thread if alive, and wait die
+			if(aiThread.isAlive())
+			{
+				aiThread.go = false;
+				try 
+				{
+					aiThread.join();
+				} catch (InterruptedException e) 
+				{
+				}
+			}
+			
+			//Check the right boxes
+			p0MenuItem.setSelected(false);
+			p1MenuItem.setSelected(true);
+			p2MenuItem.setSelected(false);
+			ai2 = new AI(Piece.Color.black);
+			
+			//Set number players
+			this.numPlayers=1;
+			
+
+		}
+		else if (numPlayers == 2)
+		{
+			//Stop thread if alive, and wait die
+			if(aiThread.isAlive())
+			{
+				aiThread.go = false;
+				try 
+				{
+					aiThread.join();
+				} catch (InterruptedException e) 
+				{
+				}
+			}
+
+			//Check the right boxes
+			p0MenuItem.setSelected(false);
+			p2MenuItem.setSelected(true);
+			p1MenuItem.setSelected(false);
+			
+			//Set number players
+			this.numPlayers=2;
+
+		}
+		else if (numPlayers == 0)
+		{
+			//Stop thread if alive, and wait die
+			if(aiThread.isAlive())
+			{
+				aiThread.go = false;
+				try 
+				{
+					aiThread.join();
+				} catch (InterruptedException e) 
+				{
+				}
+			}
+			
+			//Set number players
+			this.numPlayers=0;
+			
+			//Check the right boxes
+			p1MenuItem.setSelected(false);
+			p2MenuItem.setSelected(false);
+			p0MenuItem.setSelected(true);
+
+			//Create the AI players
+			ai1 = new AI(Piece.Color.white);
+			ai2 = new AI(Piece.Color.black);
+			
+			//Disable the tile panel
+			this.buttonAccessible(false);
+			
+			//Create and run thread
+			aiThread = new AiThread();
+			aiThread.start();
+		}
+		
 		this.numPlayers = numPlayers;
 		
 		this.clearAllHighlights();
@@ -551,61 +647,22 @@ public class Frame extends JFrame
 		//Clear move
 		move = null;
 		
-		//New Board
-		board = new Board();
+		//Enable Buttons
+		this.openButtons(true);
 
-		if(numPlayers == 1)
-		{
-			//Check the right boxes
-			p1MenuItem.setSelected(true);
-			p2MenuItem.setSelected(false);
-			ai2 = new AI(Piece.Color.black);
-			
-			//Set number players
-			this.numPlayers=1;
-		}
-		else if (numPlayers == 2)
-		{
-			//Check the right boxes
-			p2MenuItem.setSelected(true);
-			p1MenuItem.setSelected(false);
-			
-			//Set number players
-			this.numPlayers=2;
-
-		}
-		else if (numPlayers == 0)
-		{
-			//Set number players
-			this.numPlayers=0;
-			
-			//Check the right boxes
-			p1MenuItem.setSelected(false);
-			p2MenuItem.setSelected(false);
-			p0MenuItem.setSelected(true);
-
-			//Create the AI players
-			ai1 = new AI(Piece.Color.white);
-			ai2 = new AI(Piece.Color.black);
-			
-			//Disable the tile panel
-			tilePanel.setEnabled(false);
-			
-			//Create and run thread
-			aiThread = new  Thread(new AiThread());
-			aiThread.start();
-		}
 	}
 	
 	
 	//Used in 0 player game
-	class AiThread implements Runnable
+	class AiThread extends Thread
 	{
+		volatile public boolean go = true;
+		
 		//Each computer player moves and waits till game over
 		public void run()
 		{
 			int wait = 200;
-			while(true)
+			while(go)
 			{
 				try
 				{
@@ -624,6 +681,7 @@ public class Frame extends JFrame
 				}
 			}
 			
+
 		}	
 	}
 			
