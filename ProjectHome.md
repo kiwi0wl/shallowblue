@@ -1,0 +1,1 @@
+A simple chess playing program written in java.
